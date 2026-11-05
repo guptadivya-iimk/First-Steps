@@ -21,9 +21,9 @@ export const Header: React.FC<HeaderProps> = ({
             <Compass className="w-4 h-4 stroke-[2.2]" />
           </div>
           <div>
-            <h1 className="text-sm font-heading font-bold text-text-main leading-tight">
+            <p className="text-sm font-heading font-bold text-text-main leading-tight">
               Hi {userName}
-            </h1>
+            </p>
             <div className="flex items-center gap-1 text-xs text-teal-text font-medium">
               <MapPin className="w-3 h-3" />
               <span>{areaLabel}</span>
