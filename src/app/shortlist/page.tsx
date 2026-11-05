@@ -1,11 +1,17 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { SEED_SCHOOLS, SECTOR_47_AREA } from "@/data/seedSchools";
+import React, { useState, useMemo, useEffect } from "react";
+import { SEED_SCHOOLS } from "@/data/seedSchools";
 import { Header } from "@/components/navigation/Header";
 import { BottomNav } from "@/components/navigation/BottomNav";
 import { DesktopSidebar } from "@/components/navigation/DesktopSidebar";
 import { SchoolCard } from "@/components/schools/SchoolCard";
+import {
+  UserWeights,
+  DEFAULT_WEIGHTS,
+  loadSavedWeights,
+} from "@/lib/scoring/weights";
+import { computeFitScore, FitScoreResult } from "@/lib/scoring/engine";
 import {
   SlidersHorizontal,
   ChevronDown,
@@ -13,10 +19,12 @@ import {
   Map,
   List,
   Sparkles,
-  Info,
+  Sliders,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function ShortlistPage() {
+  const [weights, setWeights] = useState<UserWeights>(DEFAULT_WEIGHTS);
   const [activeBucket, setActiveBucket] = useState<string>("all");
   const [montessoriOnly, setMontessoriOnly] = useState<boolean>(false);
   const [cctvOnly, setCctvOnly] = useState<boolean>(false);
@@ -25,60 +33,65 @@ export default function ShortlistPage() {
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [showExcluded, setShowExcluded] = useState<boolean>(false);
 
+  // Load weights on client mount & listen for live updates
+  useEffect(() => {
+    setWeights(loadSavedWeights());
+
+    const handleWeightsUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<UserWeights>;
+      if (customEvent.detail) {
+        setWeights(customEvent.detail);
+      }
+    };
+
+    window.addEventListener("firststeps:weights_updated", handleWeightsUpdate);
+    return () => {
+      window.removeEventListener("firststeps:weights_updated", handleWeightsUpdate);
+    };
+  }, []);
+
   // Filtered & scored list calculation
-  const { matchingSchools, excludedSchools } = useMemo(() => {
-    const matching: typeof SEED_SCHOOLS = [];
+  const { scoredMatching, excludedSchools } = useMemo(() => {
+    const matching: { school: (typeof SEED_SCHOOLS)[0]; result: FitScoreResult; cabMinutes: number }[] = [];
     const excluded: { school: (typeof SEED_SCHOOLS)[0]; reason: string }[] = [];
 
-    SEED_SCHOOLS.forEach((school) => {
-      // Check for hard exclusion: closed schools
-      if (school.status === "possibly_closed") {
+    // Cab times mapping for demo seed schools
+    const cabTimes = [6, 8, 11, 9, 7, 8, 12, 10, 14, 15, 12, 9, 13, 11];
+
+    SEED_SCHOOLS.forEach((school, index) => {
+      const cab = cabTimes[index % cabTimes.length];
+      const result = computeFitScore(school, {
+        weights,
+        maxTravelMinutes: 20,
+        dropMinutes: cab,
+        pickupMinutes: cab,
+        mustHaves: {
+          montessori: montessoriOnly,
+          cctvParentAccess: cctvOnly,
+          flexibleDaycare: daycareOnly,
+        },
+      });
+
+      if (result.isExcluded) {
         excluded.push({
           school,
-          reason: "Status marked as possibly closed (redirects to another school)",
+          reason: result.exclusionReason || "Did not match your must-have preferences.",
         });
-        return;
+      } else {
+        matching.push({ school, result, cabMinutes: cab });
       }
-
-      // Check must-have filters
-      if (montessoriOnly) {
-        const curr = school.facts.curriculum?.displayText?.toLowerCase() || "";
-        if (curr.includes("not montessori") || school.facts.curriculum?.value === "HighScope") {
-          excluded.push({
-            school,
-            reason: "Does not follow Montessori methodology",
-          });
-          return;
-        }
-      }
-
-      if (cctvOnly) {
-        const cctv = school.facts.cctvParentAccess?.value;
-        if (!cctv) {
-          excluded.push({
-            school,
-            reason: "Parent-accessible CCTV not confirmed",
-          });
-          return;
-        }
-      }
-
-      if (daycareOnly) {
-        const daycare = school.facts.daycareAvailable?.value;
-        if (daycare === false) {
-          excluded.push({
-            school,
-            reason: "School confirmed no daycare facility",
-          });
-          return;
-        }
-      }
-
-      matching.push(school);
     });
 
-    return { matchingSchools: matching, excludedSchools: excluded };
-  }, [montessoriOnly, cctvOnly, daycareOnly]);
+    // Sorting
+    matching.sort((a, b) => {
+      if (sortBy === "cab") {
+        return a.cabMinutes - b.cabMinutes;
+      }
+      return b.result.totalScore - a.result.totalScore;
+    });
+
+    return { scoredMatching: matching, excludedSchools: excluded };
+  }, [weights, montessoriOnly, cctvOnly, daycareOnly, sortBy]);
 
   return (
     <div className="min-h-screen bg-bg flex">
@@ -97,57 +110,70 @@ export default function ShortlistPage() {
                 Your preschool shortlist
               </h1>
               <p className="text-xs sm:text-sm text-text-muted mt-0.5">
-                {matchingSchools.length} shortlisted from {SEED_SCHOOLS.length} nearby · within 20 min by cab
+                {scoredMatching.length} shortlisted from {SEED_SCHOOLS.length} nearby · scored with your weights
               </p>
             </div>
 
-            {/* List / Map Switch */}
-            <div className="flex items-center gap-1 bg-bg-card border border-border-light rounded-chip p-1 self-start sm:self-auto shadow-sm">
-              <button
-                onClick={() => setViewMode("list")}
-                className={`min-h-touch px-3 py-1.5 rounded-chip text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                  viewMode === "list"
-                    ? "bg-teal-primary text-white"
-                    : "text-text-muted hover:text-text-main"
-                }`}
-                aria-label="List View"
+            {/* List / Map Switch & Calibrate link */}
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <Link
+                href="/settings/needs"
+                className="min-h-touch inline-flex items-center gap-1.5 px-3 py-1.5 rounded-chip text-xs font-semibold bg-teal-tint text-teal-text border border-teal-text/20 hover:bg-teal-primary hover:text-white transition-colors"
               >
-                <List className="w-3.5 h-3.5" />
-                <span>List</span>
-              </button>
-              <button
-                onClick={() => setViewMode("map")}
-                className={`min-h-touch px-3 py-1.5 rounded-chip text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                  viewMode === "map"
-                    ? "bg-teal-primary text-white"
-                    : "text-text-muted hover:text-text-main"
-                }`}
-                aria-label="Map View"
-              >
-                <Map className="w-3.5 h-3.5" />
-                <span>Map</span>
-              </button>
+                <Sliders className="w-3.5 h-3.5" />
+                <span>Adjust Weights</span>
+              </Link>
+
+              <div className="flex items-center gap-1 bg-bg-card border border-border-light rounded-chip p-1 shadow-sm">
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`min-h-touch px-3 py-1.5 rounded-chip text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                    viewMode === "list"
+                      ? "bg-teal-primary text-white"
+                      : "text-text-muted hover:text-text-main"
+                  }`}
+                  aria-label="List View"
+                >
+                  <List className="w-3.5 h-3.5" />
+                  <span>List</span>
+                </button>
+                <button
+                  onClick={() => setViewMode("map")}
+                  className={`min-h-touch px-3 py-1.5 rounded-chip text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                    viewMode === "map"
+                      ? "bg-teal-primary text-white"
+                      : "text-text-muted hover:text-text-main"
+                  }`}
+                  aria-label="Map View"
+                >
+                  <Map className="w-3.5 h-3.5" />
+                  <span>Map</span>
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Live Progress Banner (Phase 1 Ready State) */}
-          <div className="bg-bg-card border border-teal-primary/30 rounded-card p-3.5 mb-6 flex items-center justify-between shadow-sm">
+          {/* Active Calibration Bar */}
+          <div className="bg-bg-card border border-teal-primary/30 rounded-card p-3.5 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-teal-tint text-teal-text flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-teal-tint text-teal-text flex items-center justify-center flex-shrink-0">
                 <Sparkles className="w-4 h-4 stroke-[2.2]" />
               </div>
               <div className="text-xs">
                 <span className="font-semibold text-text-main block">
-                  Seed Data Loaded (14 Verified Schools)
+                  Active Calibration: Montessori {weights.montessori}% · Safety {weights.safety}% · Daycare {weights.daycare}% · Travel {weights.travel}% · Fees {weights.fees}%
                 </span>
                 <span className="text-text-muted">
-                  Showing verified schools around Malibu Towne and Sector 47.
+                  Scores update dynamically whenever you change your priority weights.
                 </span>
               </div>
             </div>
-            <span className="text-[11px] font-semibold text-teal-text bg-teal-tint px-2.5 py-1 rounded-chip border border-teal-text/20">
-              Active
-            </span>
+            <Link
+              href="/settings/needs"
+              className="text-[11px] font-semibold text-teal-text hover:underline flex-shrink-0"
+            >
+              Change weights
+            </Link>
           </div>
 
           {/* Filter Bar */}
@@ -155,7 +181,7 @@ export default function ShortlistPage() {
             <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
               <span className="text-xs font-medium text-text-muted flex items-center gap-1 flex-shrink-0">
                 <SlidersHorizontal className="w-3.5 h-3.5" />
-                Filter:
+                Must-haves:
               </span>
 
               <button
@@ -196,40 +222,18 @@ export default function ShortlistPage() {
           {/* Main Grid or Map */}
           {viewMode === "list" ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-              {matchingSchools.map((school, index) => {
-                // Determine mock travel time and score for phase 1 demo
-                const cabTimes = [6, 8, 11, 9, 7, 8, 12, 10, 14, 15, 12, 9, 13, 11];
-                const scores = [92, 88, 85, 84, 82, 79, 78, 77, 75, 74, 62, 81, 80, 72];
-                const feeBuckets: Array<"Low" | "Medium" | "High"> = [
-                  "Low",
-                  "Medium",
-                  "Medium",
-                  "Medium",
-                  "Low",
-                  "Medium",
-                  "Medium",
-                  "Medium",
-                  "High",
-                  "Medium",
-                  "High",
-                  "High",
-                  "High",
-                  "High",
-                ];
-
-                return (
-                  <SchoolCard
-                    key={school.id}
-                    school={school}
-                    cabMinutes={cabTimes[index % cabTimes.length]}
-                    fitScore={scores[index % scores.length]}
-                    feeBucket={feeBuckets[index % feeBuckets.length]}
-                    onAskSeats={(id) => {
-                      alert(`Message composer will open for ${school.name} in Phase 4.`);
-                    }}
-                  />
-                );
-              })}
+              {scoredMatching.map(({ school, result, cabMinutes }) => (
+                <SchoolCard
+                  key={school.id}
+                  school={school}
+                  cabMinutes={cabMinutes}
+                  fitScore={result.totalScore}
+                  feeBucket={result.feeBucket}
+                  onAskSeats={(id) => {
+                    alert(`Message composer will open for ${school.name} in Phase 4.`);
+                  }}
+                />
+              ))}
             </div>
           ) : (
             <div className="bg-bg-card rounded-card border border-border-light p-8 text-center min-h-[350px] flex flex-col items-center justify-center shadow-card">

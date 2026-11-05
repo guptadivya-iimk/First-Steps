@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use } from "react";
+import React, { use, useState, useEffect } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SEED_SCHOOLS } from "@/data/seedSchools";
@@ -10,6 +10,14 @@ import { Header } from "@/components/navigation/Header";
 import { BottomNav } from "@/components/navigation/BottomNav";
 import { DesktopSidebar } from "@/components/navigation/DesktopSidebar";
 import {
+  UserWeights,
+  DEFAULT_WEIGHTS,
+  loadSavedWeights,
+  WEIGHT_KEYS,
+  WEIGHT_LABELS,
+} from "@/lib/scoring/weights";
+import { computeFitScore } from "@/lib/scoring/engine";
+import {
   ArrowLeft,
   ExternalLink,
   Phone,
@@ -17,9 +25,7 @@ import {
   Mail,
   Send,
   AlertTriangle,
-  Info,
-  Calendar,
-  FileText,
+  Sliders,
   Mic,
 } from "lucide-react";
 
@@ -31,15 +37,29 @@ export default function SchoolDetailPage({
   const { id } = use(params);
   const school = SEED_SCHOOLS.find((s) => s.id === id);
 
+  const [weights, setWeights] = useState<UserWeights>(DEFAULT_WEIGHTS);
+
+  useEffect(() => {
+    setWeights(loadSavedWeights());
+  }, []);
+
   if (!school) {
     notFound();
   }
 
   const phone = school.contacts.find((c) => c.type === "phone")?.value;
-  const whatsapp = school.contacts.find((c) => c.type === "whatsapp")?.value || phone?.replace(/[^0-9]/g, "");
+  const whatsapp =
+    school.contacts.find((c) => c.type === "whatsapp")?.value ||
+    phone?.replace(/[^0-9]/g, "");
   const email = school.contacts.find((c) => c.type === "email")?.value;
 
-  // Facts categorized
+  const scoreResult = computeFitScore(school, {
+    weights,
+    maxTravelMinutes: 20,
+    dropMinutes: 8,
+    pickupMinutes: 8,
+  });
+
   const factsList = Object.values(school.facts);
 
   return (
@@ -89,7 +109,7 @@ export default function SchoolDetailPage({
                 </div>
               </div>
 
-              <FitScoreBadge score={88} size="lg" />
+              <FitScoreBadge score={scoreResult.totalScore} size="lg" />
             </div>
 
             {/* Quick Contact Action Bar */}
@@ -143,7 +163,9 @@ export default function SchoolDetailPage({
             <div className="mt-4">
               <button
                 onClick={() => {
-                  alert("Message Composer (WhatsApp / Email / Call Script) will be implemented in Phase 4.");
+                  alert(
+                    "Message Composer (WhatsApp / Email / Call Script) will be implemented in Phase 4."
+                  );
                 }}
                 className="w-full min-h-touch inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-btn bg-teal-primary hover:bg-teal-hover text-white text-sm font-semibold shadow-sm transition-colors"
               >
@@ -153,76 +175,69 @@ export default function SchoolDetailPage({
             </div>
           </div>
 
-          {/* Score Breakdown (Section 6.5) */}
+          {/* Dynamic Score Breakdown (Section 6.5) */}
           <div className="bg-bg-card rounded-card border border-border-light shadow-card p-6 mb-6">
-            <h2 className="text-lg font-heading font-bold text-text-main mb-4">
-              Fit Score Breakdown (88 / 100)
-            </h2>
-            <div className="space-y-3">
+            <div className="flex items-center justify-between gap-2 mb-4">
               <div>
-                <div className="flex justify-between text-xs font-medium mb-1">
-                  <span>Montessori Authenticity (30%)</span>
-                  <span className="font-semibold text-teal-text">27 / 30 pts</span>
-                </div>
-                <div className="w-full bg-bg h-2 rounded-full overflow-hidden">
-                  <div className="bg-teal-primary h-2 rounded-full" style={{ width: "90%" }} />
-                </div>
-                <span className="text-[11px] text-text-muted mt-0.5 block">
-                  + Sourced pure Montessori methodology; − AMI/AMS teacher certification to be confirmed.
+                <h2 className="text-lg font-heading font-bold text-text-main">
+                  Fit Score Breakdown ({scoreResult.totalScore} / 100)
+                </h2>
+                <span className="text-xs text-text-muted">
+                  Computed dynamically based on your custom weightages.
                 </span>
               </div>
+              <Link
+                href="/settings/needs"
+                className="text-xs font-semibold text-teal-text hover:underline inline-flex items-center gap-1"
+              >
+                <Sliders className="w-3.5 h-3.5" />
+                <span>Calibrate</span>
+              </Link>
+            </div>
 
-              <div>
-                <div className="flex justify-between text-xs font-medium mb-1">
-                  <span>Safety & Girl-Child Protection (30%)</span>
-                  <span className="font-semibold text-teal-text">26 / 30 pts</span>
-                </div>
-                <div className="w-full bg-bg h-2 rounded-full overflow-hidden">
-                  <div className="bg-teal-primary h-2 rounded-full" style={{ width: "86%" }} />
-                </div>
-                <span className="text-[11px] text-text-muted mt-0.5 block">
-                  + Parent live CCTV access verified on listing; police checks to confirm on call.
-                </span>
-              </div>
+            <div className="space-y-4">
+              {WEIGHT_KEYS.map((k) => {
+                const item = scoreResult.breakdown[k];
+                const info = WEIGHT_LABELS[k];
+                const pct =
+                  item.maxPoints > 0
+                    ? Math.round((item.earnedPoints / item.maxPoints) * 100)
+                    : 0;
 
-              <div>
-                <div className="flex justify-between text-xs font-medium mb-1">
-                  <span>Daycare Flexibility (15%)</span>
-                  <span className="font-semibold text-teal-text">12 / 15 pts</span>
-                </div>
-                <div className="w-full bg-bg h-2 rounded-full overflow-hidden">
-                  <div className="bg-teal-primary h-2 rounded-full" style={{ width: "80%" }} />
-                </div>
-                <span className="text-[11px] text-text-muted mt-0.5 block">
-                  Flexible transition slots available from 12:30 PM up to 6:00 PM.
-                </span>
-              </div>
+                return (
+                  <div key={k}>
+                    <div className="flex justify-between text-xs font-medium mb-1">
+                      <span className="font-semibold text-text-main">
+                        {info.title} ({item.maxPoints}%)
+                      </span>
+                      <span className="font-semibold text-teal-text">
+                        {item.earnedPoints} / {item.maxPoints} pts
+                      </span>
+                    </div>
+                    <div className="w-full bg-bg h-2 rounded-full overflow-hidden shadow-inner">
+                      <div
+                        className="h-2 rounded-full transition-all duration-300"
+                        style={{
+                          width: `${pct}%`,
+                          backgroundColor: info.color,
+                        }}
+                      />
+                    </div>
+                    <span className="text-[11px] text-text-muted mt-0.5 block">
+                      {item.reason}
+                    </span>
+                  </div>
+                );
+              })}
 
-              <div>
-                <div className="flex justify-between text-xs font-medium mb-1">
-                  <span>Cab Travel Time (15%)</span>
-                  <span className="font-semibold text-teal-text">15 / 15 pts</span>
+              {scoreResult.confidencePenalty > 0 && (
+                <div className="pt-2 border-t border-border-light text-xs text-amber-text flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span>
+                    −{scoreResult.confidencePenalty} pts confidence adjustment applied for conflicting/old listing data. Score may improve once verified by the school.
+                  </span>
                 </div>
-                <div className="w-full bg-bg h-2 rounded-full overflow-hidden">
-                  <div className="bg-teal-primary h-2 rounded-full" style={{ width: "100%" }} />
-                </div>
-                <span className="text-[11px] text-text-muted mt-0.5 block">
-                  Only 6 to 8 minutes from Sector 47 during peak drop-off (09:00 AM).
-                </span>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs font-medium mb-1">
-                  <span>Fee Bracket (10%)</span>
-                  <span className="font-semibold text-teal-text">8 / 10 pts</span>
-                </div>
-                <div className="w-full bg-bg h-2 rounded-full overflow-hidden">
-                  <div className="bg-teal-primary h-2 rounded-full" style={{ width: "80%" }} />
-                </div>
-                <span className="text-[11px] text-text-muted mt-0.5 block">
-                  Fits within Low/Medium threshold benchmark for Sector 47.
-                </span>
-              </div>
+              )}
             </div>
           </div>
 
@@ -237,7 +252,10 @@ export default function SchoolDetailPage({
 
             <div className="divide-y divide-border-light">
               {factsList.map((fact) => (
-                <div key={fact.key} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div
+                  key={fact.key}
+                  className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+                >
                   <div className="flex-1">
                     <span className="text-xs font-semibold text-text-main block">
                       {fact.displayText}
