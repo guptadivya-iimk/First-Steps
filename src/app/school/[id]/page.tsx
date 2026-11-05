@@ -1,33 +1,49 @@
 "use client";
 
-import React, { use, useState, useEffect } from "react";
+import React, { use } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SEED_SCHOOLS } from "@/data/seedSchools";
-import { StatusTag } from "@/components/schools/StatusTag";
-import { FitScoreBadge } from "@/components/schools/FitScoreBadge";
-import { Header } from "@/components/navigation/Header";
-import { BottomNav } from "@/components/navigation/BottomNav";
-import { DesktopSidebar } from "@/components/navigation/DesktopSidebar";
-import {
-  UserWeights,
-  DEFAULT_WEIGHTS,
-  loadSavedWeights,
-  WEIGHT_KEYS,
-  WEIGHT_LABELS,
-} from "@/lib/scoring/weights";
-import { computeFitScore } from "@/lib/scoring/engine";
 import {
   ArrowLeft,
   ExternalLink,
   Phone,
   MessageSquare,
   Mail,
-  Send,
+  Car,
   AlertTriangle,
-  Sliders,
-  Mic,
+  Heart,
 } from "lucide-react";
+import { SEED_SCHOOLS, SECTOR_47_AREA } from "@/data/seedSchools";
+import { AppShell } from "@/components/navigation/AppShell";
+import { StatusTag } from "@/components/schools/StatusTag";
+import { FitScoreBadge } from "@/components/schools/FitScoreBadge";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { usePreferences } from "@/lib/usePreferences";
+import { estimateCabMinutes, scoreSchool } from "@/lib/scoring";
+import { cn } from "@/lib/utils";
+import { Sun, SchoolMark } from "@/components/doodles";
+import { crayonClass, doodleFor } from "@/lib/schoolIdentity";
+
+const SchoolMap = dynamic(
+  () => import("@/components/map/SchoolMap").then((m) => m.SchoolMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-full w-full items-center justify-center bg-paper-deep text-step-3 text-ink-faint">
+        Drawing the map…
+      </div>
+    ),
+  }
+);
 
 export default function SchoolDetailPage({
   params,
@@ -35,17 +51,20 @@ export default function SchoolDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const { prefs, toggleShortlist } = usePreferences();
   const school = SEED_SCHOOLS.find((s) => s.id === id);
 
-  const [weights, setWeights] = useState<UserWeights>(DEFAULT_WEIGHTS);
+  if (!school) notFound();
 
-  useEffect(() => {
-    setWeights(loadSavedWeights());
-  }, []);
-
-  if (!school) {
-    notFound();
-  }
+  const cabMinutes = estimateCabMinutes(SECTOR_47_AREA.center, school.location);
+  const score = scoreSchool({
+    school,
+    weights: prefs.weights,
+    cabMinutes,
+    maxTravelMinutes: prefs.maxTravelMinutes,
+    budgetBuckets: prefs.budgetBuckets,
+    feeThresholds: SECTOR_47_AREA.feeThresholds,
+  });
 
   const phone = school.contacts.find((c) => c.type === "phone")?.value;
   const whatsapp =
@@ -53,265 +72,259 @@ export default function SchoolDetailPage({
     phone?.replace(/[^0-9]/g, "");
   const email = school.contacts.find((c) => c.type === "email")?.value;
 
-  const scoreResult = computeFitScore(school, {
-    weights,
-    maxTravelMinutes: 20,
-    dropMinutes: 8,
-    pickupMinutes: 8,
-  });
-
-  const factsList = Object.values(school.facts);
+  const facts = Object.values(school.facts);
+  const conflicts = facts.filter((f) => f.status === "conflicting");
+  const saved = prefs.shortlisted.includes(school.id);
 
   return (
-    <div className="min-h-screen bg-bg flex">
-      <DesktopSidebar />
-
-      <div className="flex-1 flex flex-col min-w-0 pb-20 lg:pb-8">
-        <Header userName="Divya" areaLabel="Sector 47, Gurugram" />
-
-        <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-6">
-          {/* Back link */}
-          <Link
-            href="/shortlist"
-            className="min-h-touch inline-flex items-center gap-1.5 text-xs font-semibold text-teal-text hover:text-teal-primary mb-4 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to shortlist</span>
+    <AppShell>
+      <div className="mx-auto w-full max-w-3xl px-4 py-5 sm:px-6">
+        <Button asChild variant="ghost" size="sm" className="-ml-2 mb-3">
+          <Link href="/shortlist">
+            <ArrowLeft />
+            All schools
           </Link>
+        </Button>
 
-          {/* School Hero Header */}
-          <div className="bg-bg-card rounded-card border border-border-light shadow-card p-6 mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-              <div>
-                <span className="text-xs font-semibold text-teal-text uppercase tracking-wider block mb-1">
-                  {school.sector} · Gurugram
-                </span>
-                <h1 className="text-2xl sm:text-3xl font-heading font-bold text-text-main mb-2">
-                  {school.name}
-                </h1>
-                <p className="text-xs text-text-muted leading-relaxed max-w-xl">
-                  {school.address}
-                </p>
+        {/* ---- Identity ---- */}
+        <header
+          className={cn(
+            crayonClass(school.id),
+            "panel-crayon relative overflow-hidden p-5 sm:p-6"
+          )}
+        >
+          {score.total >= 85 && (
+            <Sun className="absolute -top-3 -right-3 size-14 opacity-70" />
+          )}
 
-                {/* External Links */}
-                <div className="flex items-center gap-4 mt-3 text-xs">
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                      school.name + " " + school.address
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-teal-primary hover:underline font-medium"
-                  >
-                    <span>Open in Google Maps</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              </div>
-
-              <FitScoreBadge score={scoreResult.totalScore} size="lg" />
-            </div>
-
-            {/* Quick Contact Action Bar */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 pt-6 border-t border-border-light">
-              {phone ? (
-                <a
-                  href={`tel:${phone}`}
-                  className="min-h-touch flex items-center justify-center gap-2 px-4 py-2.5 rounded-btn border border-border text-xs font-semibold text-text-main hover:bg-bg transition-colors"
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <p className="flex items-center gap-2 text-step-2 font-bold tracking-wide text-[var(--crayon-ink)] uppercase">
+                <span
+                  className="flex size-7 items-center justify-center rounded-[var(--radius-chip)] bg-[var(--crayon-pale)]"
+                  aria-hidden="true"
                 >
-                  <Phone className="w-4 h-4 text-teal-primary" />
-                  <span>Call {phone}</span>
-                </a>
-              ) : (
-                <div className="min-h-touch flex items-center justify-center gap-2 px-4 py-2.5 rounded-btn border border-dashed border-border-light text-xs text-text-muted">
-                  No phone listed
-                </div>
-              )}
+                  <SchoolMark name={doodleFor(school.id)} className="size-4" />
+                </span>
+                {school.sector} · {school.city}
+              </p>
+              <h1 className="mt-1 font-display text-step-8 leading-tight font-extrabold text-ink sm:text-step-9">
+                {school.name}
+              </h1>
+              <p className="mt-2 flex items-center gap-1.5 text-step-3 text-ink-soft">
+                <Car className="size-4 text-[var(--crayon)]" />
+                About {cabMinutes} min by cab at 9am
+              </p>
+            </div>
+            <FitScoreBadge score={score.total} size="md" />
+          </div>
 
-              {whatsapp ? (
+          {school.status === "possibly_closed" && (
+            <p className="mt-4 flex items-start gap-2 rounded-[var(--radius-btn)] bg-marigold-pale px-3 py-2.5 text-step-3 text-marigold-ink">
+              <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+              This branch may have closed. Call before you plan a visit.
+            </p>
+          )}
+
+          {/* ---- Reach them ---- */}
+          <div className="mt-5 grid gap-2 sm:grid-cols-3">
+            {phone && (
+              <Button asChild variant="outline">
+                <a href={`tel:${phone.replace(/\s/g, "")}`}>
+                  <Phone />
+                  Call
+                </a>
+              </Button>
+            )}
+            {whatsapp && (
+              <Button asChild variant="outline">
                 <a
                   href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}`}
                   target="_blank"
-                  rel="noopener noreferrer"
-                  className="min-h-touch flex items-center justify-center gap-2 px-4 py-2.5 rounded-btn border border-teal-text/30 bg-teal-tint text-xs font-semibold text-teal-text hover:bg-teal-tint/80 transition-colors"
+                  rel="noreferrer"
                 >
-                  <MessageSquare className="w-4 h-4" />
-                  <span>WhatsApp</span>
+                  <MessageSquare />
+                  WhatsApp
                 </a>
-              ) : (
-                <div className="min-h-touch flex items-center justify-center gap-2 px-4 py-2.5 rounded-btn border border-dashed border-border-light text-xs text-text-muted">
-                  No WhatsApp listed
-                </div>
-              )}
-
-              {email ? (
-                <a
-                  href={`mailto:${email}`}
-                  className="min-h-touch flex items-center justify-center gap-2 px-4 py-2.5 rounded-btn border border-border text-xs font-semibold text-text-main hover:bg-bg transition-colors"
-                >
-                  <Mail className="w-4 h-4 text-teal-primary" />
-                  <span>Email</span>
+              </Button>
+            )}
+            {email && (
+              <Button asChild variant="outline">
+                <a href={`mailto:${email}`}>
+                  <Mail />
+                  Email
                 </a>
-              ) : (
-                <div className="min-h-touch flex items-center justify-center gap-2 px-4 py-2.5 rounded-btn border border-dashed border-border-light text-xs text-text-muted">
-                  No email listed
-                </div>
-              )}
-            </div>
-
-            {/* Primary Action: Ask School */}
-            <div className="mt-4">
-              <button
-                onClick={() => {
-                  alert(
-                    "Message Composer (WhatsApp / Email / Call Script) will be implemented in Phase 4."
-                  );
-                }}
-                className="w-full min-h-touch inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-btn bg-teal-primary hover:bg-teal-hover text-white text-sm font-semibold shadow-sm transition-colors"
-              >
-                <Send className="w-4 h-4" />
-                <span>Ask the school (AI drafts questions for approval)</span>
-              </button>
-            </div>
+              </Button>
+            )}
           </div>
 
-          {/* Dynamic Score Breakdown (Section 6.5) */}
-          <div className="bg-bg-card rounded-card border border-border-light shadow-card p-6 mb-6">
-            <div className="flex items-center justify-between gap-2 mb-4">
-              <div>
-                <h2 className="text-lg font-heading font-bold text-text-main">
-                  Fit Score Breakdown ({scoreResult.totalScore} / 100)
-                </h2>
-                <span className="text-xs text-text-muted">
-                  Computed dynamically based on your custom weightages.
-                </span>
-              </div>
-              <Link
-                href="/settings/needs"
-                className="text-xs font-semibold text-teal-text hover:underline inline-flex items-center gap-1"
-              >
-                <Sliders className="w-3.5 h-3.5" />
-                <span>Calibrate</span>
-              </Link>
-            </div>
+          <div className="mt-2 grid gap-2 sm:grid-cols-[auto_1fr]">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => toggleShortlist(school.id)}
+              aria-pressed={saved}
+            >
+              <Heart
+                className={cn(saved && "fill-blossom text-blossom")}
+              />
+              {saved ? "Saved" : "Save"}
+            </Button>
+            <Button variant="warm">Draft my questions</Button>
+          </div>
+          <p className="mt-2 text-step-2 text-ink-faint">
+            Nothing is sent until you read it and press send yourself.
+          </p>
+        </header>
 
-            <div className="space-y-4">
-              {WEIGHT_KEYS.map((k) => {
-                const item = scoreResult.breakdown[k];
-                const info = WEIGHT_LABELS[k];
-                const pct =
-                  item.maxPoints > 0
-                    ? Math.round((item.earnedPoints / item.maxPoints) * 100)
-                    : 0;
+        {/* ---- Worth asking ---- */}
+        {(conflicts.length > 0 || score.openQuestions.length > 0) && (
+          <section className="panel mt-4 border-marigold/30 bg-marigold-pale p-5">
+            <h2 className="font-display text-step-6 font-bold text-marigold-ink">
+              Worth asking about
+            </h2>
+            <ul className="mt-3 flex flex-col gap-2">
+              {score.openQuestions.map((q) => (
+                <li
+                  key={q}
+                  className="flex items-start gap-2 text-step-3 leading-relaxed text-marigold-ink"
+                >
+                  <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+                  {q}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
-                return (
-                  <div key={k}>
-                    <div className="flex justify-between text-xs font-medium mb-1">
-                      <span className="font-semibold text-text-main">
-                        {info.title} ({item.maxPoints}%)
-                      </span>
-                      <span className="font-semibold text-teal-text">
-                        {item.earnedPoints} / {item.maxPoints} pts
-                      </span>
-                    </div>
-                    <div className="w-full bg-bg h-2 rounded-full overflow-hidden shadow-inner">
-                      <div
-                        className="h-2 rounded-full transition-all duration-300"
-                        style={{
-                          width: `${pct}%`,
-                          backgroundColor: info.color,
-                        }}
-                      />
-                    </div>
-                    <span className="text-[11px] text-text-muted mt-0.5 block">
-                      {item.reason}
-                    </span>
-                  </div>
-                );
-              })}
-
-              {scoreResult.confidencePenalty > 0 && (
-                <div className="pt-2 border-t border-border-light text-xs text-amber-text flex items-center gap-1.5">
-                  <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span>
-                    −{scoreResult.confidencePenalty} pts confidence adjustment applied for conflicting/old listing data. Score may improve once verified by the school.
+        {/* ---- Why this score ---- */}
+        <section className="panel mt-4 p-5 sm:p-6">
+          <h2 className="font-display text-step-6 font-bold text-ink">
+            Why {score.total} out of 100
+          </h2>
+          <ul className="mt-4 flex flex-col gap-4">
+            {score.components.map((c) => (
+              <li key={c.key}>
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="text-step-4 font-semibold text-ink">
+                    {c.label}
+                  </span>
+                  <span className="text-step-3 tabular-nums text-ink-faint">
+                    {c.points} / {c.weight}
                   </span>
                 </div>
-              )}
-            </div>
-          </div>
+                <Progress
+                  value={(c.points / Math.max(c.weight, 1)) * 100}
+                  className="mt-1.5 h-2 bg-paper-deep"
+                />
+                <p className="mt-1.5 text-step-3 text-ink-soft">{c.note}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
 
-          {/* Provenance Facts Table */}
-          <div className="bg-bg-card rounded-card border border-border-light shadow-card p-6 mb-6">
-            <h2 className="text-lg font-heading font-bold text-text-main mb-1">
-              Verified Facts & Source Provenance
-            </h2>
-            <p className="text-xs text-text-muted mb-4">
-              Every detail is tracked with its origin source and timestamp.
-            </p>
+        {/* ---- Where each fact came from ---- */}
+        <section className="panel mt-4 p-5 sm:p-6">
+          <h2 className="font-display text-step-6 font-bold text-ink">
+            Where each fact came from
+          </h2>
+          <p className="mt-1 text-step-3 text-ink-soft">
+            Tap a row to see the exact wording and the source.
+          </p>
 
-            <div className="divide-y divide-border-light">
-              {factsList.map((fact) => (
-                <div
-                  key={fact.key}
-                  className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
-                >
-                  <div className="flex-1">
-                    <span className="text-xs font-semibold text-text-main block">
+          <Accordion type="single" collapsible className="mt-3">
+            {facts.map((fact) => (
+              <AccordionItem
+                key={fact.key}
+                value={fact.key}
+                className="border-line"
+              >
+                <AccordionTrigger className="min-h-touch items-center gap-3 py-3.5 hover:no-underline">
+                  <span className="flex flex-1 flex-wrap items-center gap-2 text-left">
+                    <span className="text-step-4 font-semibold text-ink">
                       {fact.displayText}
                     </span>
-                    {fact.conflictNote && (
-                      <span className="text-[11px] text-amber-text flex items-center gap-1 mt-0.5">
-                        <AlertTriangle className="w-3 h-3" />
-                        {fact.conflictNote}
-                      </span>
-                    )}
-                    {fact.sources.length > 0 && (
-                      <span className="text-[11px] text-text-muted mt-0.5 block">
-                        Source: {fact.sources[0].name} ({fact.sources[0].quote})
-                      </span>
-                    )}
-                  </div>
-                  <div className="self-start sm:self-center">
                     <StatusTag status={fact.status} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <ul className="flex flex-col gap-2.5">
+                    {fact.sources.map((source, i) => (
+                      <li
+                        key={`${fact.key}-${i}`}
+                        className="rounded-[var(--radius-btn)] bg-paper-deep p-3"
+                      >
+                        <p className="text-step-3 leading-relaxed text-ink">
+                          {source.quote ? `“${source.quote}”` : source.name}
+                        </p>
+                        <p className="mt-1.5 flex flex-wrap items-center gap-2 text-step-2 text-ink-faint">
+                          <Badge variant="outline">{source.name}</Badge>
+                          <span>seen {source.capturedAt}</span>
+                          {source.url && (
+                            <a
+                              href={source.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 font-semibold text-teal-ink hover:underline"
+                            >
+                              Open
+                              <ExternalLink className="size-3" />
+                            </a>
+                          )}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </section>
 
-          {/* Quick Notes Section */}
-          <div className="bg-bg-card rounded-card border border-border-light shadow-card p-6">
-            <h2 className="text-lg font-heading font-bold text-text-main mb-2">
-              My Notes & Observations
-            </h2>
-            <p className="text-xs text-text-muted mb-4">
-              Private notes stored securely on your account.
-            </p>
-            <textarea
-              className="w-full h-24 p-3 rounded-xl border border-border text-xs focus:ring-1 focus:ring-teal-primary focus:outline-none"
-              placeholder="Record impressions, questions asked on call, or grandparent drop-off notes..."
-            />
-            <div className="flex justify-end gap-2 mt-3">
-              <button
-                type="button"
-                className="min-h-touch inline-flex items-center gap-1.5 px-3 py-1.5 rounded-btn border border-border text-xs font-medium text-text-muted hover:text-text-main"
-              >
-                <Mic className="w-4 h-4 text-teal-primary" />
-                <span>Voice Note</span>
-              </button>
-              <button
-                type="button"
-                className="min-h-touch inline-flex items-center px-4 py-1.5 rounded-btn bg-teal-primary text-white text-xs font-semibold hover:bg-teal-hover"
-              >
-                Save Notes
-              </button>
-            </div>
-          </div>
-        </main>
+        {/* ---- Address ---- */}
+        <section className="panel mt-4 p-5 sm:p-6">
+          <h2 className="font-display text-step-6 font-bold text-ink">
+            Getting there
+          </h2>
+          <p className="mt-2 text-step-3 leading-relaxed text-ink-soft">
+            {school.address}
+          </p>
+
+          <p className="mt-3 text-step-2 text-ink-faint">
+            On the map below, the white ring is Sector 47, where your search
+            starts.
+          </p>
+          {school.website && (
+            <a
+              href={school.website}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-1 inline-flex min-h-touch items-center gap-1.5 text-step-3 font-semibold text-teal-ink hover:underline"
+            >
+              School website
+              <ExternalLink className="size-3.5" />
+            </a>
+          )}
+        </section>
+
+        <div className="mt-3 h-60 overflow-hidden rounded-[var(--radius-card)] sm:h-72">
+          <SchoolMap
+            schools={[
+              {
+                id: school.id,
+                name: school.name,
+                sector: school.sector,
+                score: score.total,
+                lat: school.location.lat,
+                lng: school.location.lng,
+              },
+            ]}
+            home={SECTOR_47_AREA.center}
+            selectedId={school.id}
+            onSelect={() => {}}
+          />
+        </div>
       </div>
-
-      <BottomNav />
-    </div>
+    </AppShell>
   );
 }

@@ -1,118 +1,131 @@
 import React from "react";
 import Link from "next/link";
-import { Car, ShieldCheck, MessageSquare, Compass, ArrowRight } from "lucide-react";
+import { Car, ShieldCheck, Send, ArrowRight, Map as MapIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Footprint, Sun, Rainbow } from "@/components/doodles";
+
+const PROMISES = [
+  {
+    Icon: MapIcon,
+    crayon: "crayon crayon-coral",
+    title: "An atlas, not a list",
+    body: "Every preschool pinned, with its fit score on the pin.",
+  },
+  {
+    Icon: Car,
+    crayon: "crayon crayon-marigold",
+    title: "Real cab times",
+    body: "Minutes at 9am traffic, not distance on a map.",
+  },
+  {
+    Icon: ShieldCheck,
+    crayon: "crayon crayon-grape",
+    title: "Montessori, checked",
+    body: "Teacher training and parent CCTV, with the source for each.",
+  },
+  {
+    Icon: Send,
+    crayon: "crayon crayon-sky",
+    title: "Questions, drafted",
+    body: "We write the message. You decide whether to send it.",
+  },
+];
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-bg flex flex-col justify-between p-4 sm:p-8">
-      {/* Top Bar */}
-      <header className="max-w-xl mx-auto w-full flex items-center justify-between py-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-teal-primary text-white flex items-center justify-center font-heading font-bold">
-            <Compass className="w-5 h-5 stroke-[2.2]" />
-          </div>
-          <span className="font-heading font-bold text-text-main text-lg tracking-tight">
-            FirstSteps Finder
+    <main className="paper-grid min-h-dvh">
+      <div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col px-4 sm:px-6">
+        <header className="flex min-h-touch items-center justify-between py-5">
+          <span className="flex items-center gap-2">
+            <span className="flex size-9 items-center justify-center rounded-[var(--radius-btn)] bg-teal text-white">
+              <Footprint className="size-5" />
+            </span>
+            <span className="font-display text-step-6 leading-none font-extrabold tracking-tight">
+              FirstSteps
+            </span>
           </span>
-        </div>
-        <span className="text-xs font-semibold px-2.5 py-1 rounded-chip bg-teal-tint text-teal-text border border-teal-text/20">
-          Gurugram
-        </span>
-      </header>
+          <span className="rounded-[var(--radius-chip)] border border-teal/25 bg-teal-pale px-3 py-1.5 text-step-2 font-semibold text-teal-ink">
+            Gurugram
+          </span>
+        </header>
 
-      {/* Main Hero Card */}
-      <div className="max-w-xl mx-auto w-full my-auto py-6">
-        <div className="bg-bg-card rounded-card border border-border-light shadow-card p-6 sm:p-8">
-          <h1 className="text-2xl sm:text-3xl font-heading font-bold text-text-main leading-tight mb-3">
-            Find the right first school, without the guesswork.
-          </h1>
-          <p className="text-sm sm:text-base text-text-muted mb-8 leading-relaxed">
-            Montessori authenticity, child safety, and daycare flexibility,
-            checked for you. Every fact clearly shows where it came from.
-          </p>
+        <div className="flex flex-1 flex-col justify-center gap-10 py-8 lg:flex-row lg:items-center lg:gap-16 lg:py-16">
+          {/* ---- The pitch ---- */}
+          <div className="flex-1">
+            <p className="mb-4 inline-flex items-center gap-2 rounded-[var(--radius-chip)] border border-coral/30 bg-coral-pale px-3 py-1.5 text-step-2 font-bold text-coral-ink">
+              14 preschools, all checked
+            </p>
 
-          {/* 3 Benefit Rows */}
-          <div className="space-y-4 mb-8">
-            <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-teal-tint text-teal-text flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Car className="w-5 h-5 stroke-[2.2]" />
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-text-main">
-                  Schools within your cab time
-                </h3>
-                <p className="text-xs text-text-muted leading-relaxed">
-                  Traffic-aware routes calculated for weekday morning drop-off
-                  and afternoon pickup.
-                </p>
-              </div>
+            <h1 className="font-display text-step-9 leading-[1.08] font-extrabold text-ink sm:text-step-10 lg:text-step-11">
+              A first school you can{" "}
+              <span className="crayon-underline">feel good</span> about.
+            </h1>
+
+            <p className="mt-5 max-w-md text-step-5 leading-relaxed text-ink-soft">
+              Fourteen preschools near Sector 47, checked for Montessori
+              training, safety and daycare hours. Every fact shows where it came
+              from.
+            </p>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button asChild size="lg" className="sm:w-auto">
+                <Link href="/welcome">
+                  Continue with Google
+                  <ArrowRight />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link href="/shortlist">Look around first</Link>
+              </Button>
             </div>
 
-            <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-teal-tint text-teal-text flex items-center justify-center flex-shrink-0 mt-0.5">
-                <ShieldCheck className="w-5 h-5 stroke-[2.2]" />
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-text-main">
-                  Real Montessori and safety checks
-                </h3>
-                <p className="text-xs text-text-muted leading-relaxed">
-                  AMI/AMS teacher training audits and parent CCTV access verified
-                  with transparent sources.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-teal-tint text-teal-text flex items-center justify-center flex-shrink-0 mt-0.5">
-                <MessageSquare className="w-5 h-5 stroke-[2.2]" />
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-text-main">
-                  Ask schools in one tap
-                </h3>
-                <p className="text-xs text-text-muted leading-relaxed">
-                  Personalized WhatsApp, email, and call drafts. Nothing is sent
-                  without your explicit OK.
-                </p>
-              </div>
-            </div>
+            <p className="mt-4 text-step-2 text-ink-faint">
+              Free while we are testing in Sector 47.
+            </p>
           </div>
 
-          {/* Action Buttons */}
-          <div className="space-y-3">
-            <Link
-              href="/welcome"
-              className="w-full min-h-touch inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-btn bg-teal-primary hover:bg-teal-hover active:bg-teal-hover text-white text-sm font-semibold shadow-sm transition-colors"
-            >
-              <span>Continue with Google</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+          {/* ---- What you get ---- */}
+          <div className="panel relative flex-1 p-5 sm:p-7">
+            <Sun className="sway absolute -top-4 -right-3 size-10" />
 
-            <Link
-              href="/shortlist"
-              className="w-full min-h-touch inline-flex items-center justify-center gap-2 px-6 py-3 rounded-btn border border-border text-xs font-semibold text-text-main hover:bg-bg transition-colors"
-            >
-              <span>Explore Sector 47 Schools (Preview)</span>
-            </Link>
+            <ul className="flex flex-col gap-5">
+              {PROMISES.map(({ Icon, title, body, crayon }) => (
+                <li key={title} className={cn(crayon, "flex items-start gap-3.5")}>
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-btn)] bg-[var(--crayon-pale)] text-[var(--crayon-ink)]">
+                    <Icon className="size-5" />
+                  </span>
+                  <div>
+                    <h2 className="font-display text-step-5 font-bold text-ink">
+                      {title}
+                    </h2>
+                    <p className="mt-0.5 text-step-3 leading-relaxed text-ink-soft">
+                      {body}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-6 flex items-center gap-3 border-t border-line pt-5">
+              <Rainbow className="h-8 w-14 shrink-0" />
+              <p className="text-step-3 text-ink-soft">
+                Made for families starting out in Sector 47.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Footer */}
-      <footer className="max-w-xl mx-auto w-full py-4 text-center text-xs text-text-muted">
-        <div className="flex items-center justify-center gap-4">
-          <Link href="/how-it-works" className="hover:underline">
+        <footer className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line py-5 text-step-2 text-ink-faint">
+          <Link href="/how-it-works" className="inline-flex min-h-touch items-center hover:text-teal-ink">
             How it works
           </Link>
-          <span>·</span>
-          <Link href="/privacy" className="hover:underline">
-            Privacy policy
+          <Link href="/privacy" className="inline-flex min-h-touch items-center hover:text-teal-ink">
+            Privacy
           </Link>
-          <span>·</span>
-          <span>Sector 47, Gurugram</span>
-        </div>
-      </footer>
+          <span className="ml-auto">Sector 47, Gurugram</span>
+        </footer>
+      </div>
     </main>
   );
 }

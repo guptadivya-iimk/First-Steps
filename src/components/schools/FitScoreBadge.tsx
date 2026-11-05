@@ -1,39 +1,59 @@
-import React from "react";
+import * as React from "react";
+import { cn } from "@/lib/utils";
+import { Star } from "@/components/doodles";
 
-interface FitScoreBadgeProps {
-  score: number;
-  size?: "sm" | "md" | "lg";
-}
-
-export const FitScoreBadge: React.FC<FitScoreBadgeProps> = ({
+/**
+ * The score ring. A star appears at 85 and above, which is the only place in
+ * the product where a decoration means something.
+ */
+export function FitScoreBadge({
   score,
   size = "md",
-}) => {
-  let colorStyles = "bg-teal-primary text-white";
-  if (score < 50) {
-    colorStyles = "bg-amber-text text-white";
-  } else if (score < 75) {
-    colorStyles = "bg-[#0B4F4B] text-white";
-  }
+  className,
+}: {
+  score: number;
+  size?: "sm" | "md" | "lg";
+  className?: string;
+}) {
+  const rounded = Math.round(score);
 
-  const dimensions =
+  const tone =
+    rounded >= 75
+      ? "bg-teal text-white"
+      : rounded >= 55
+        ? "bg-teal-pale text-teal-ink ring-1 ring-teal/30"
+        : "bg-marigold-pale text-marigold-ink ring-1 ring-marigold/40";
+
+  const box =
     size === "sm"
-      ? "w-10 h-10 text-xs"
+      ? "size-11 text-step-4"
       : size === "lg"
-      ? "w-16 h-16 text-xl"
-      : "w-12 h-12 text-sm";
+        ? "size-18 text-step-8"
+        : "size-14 text-step-6";
 
   return (
-    <div className="flex flex-col items-center">
-      <div
-        className={`rounded-full flex items-center justify-center font-heading font-bold shadow-card ${dimensions} ${colorStyles}`}
-        aria-label={`Fit score ${score} out of 100`}
-      >
-        {Math.round(score)}
+    <div className={cn("flex flex-col items-center gap-1", className)}>
+      <div className="relative">
+        <div
+          className={cn(
+            "flex items-center justify-center rounded-[var(--radius-chip)] font-display font-extrabold tabular-nums",
+            box,
+            tone
+          )}
+        >
+          {rounded}
+        </div>
+        {rounded >= 85 && (
+          <Star
+            className="absolute -top-1 -right-1 size-4 text-marigold drop-shadow-sm"
+            aria-hidden="true"
+          />
+        )}
       </div>
-      <span className="text-[10px] font-medium text-text-muted mt-0.5 uppercase tracking-wide">
-        Fit Score
+      <span className="text-step-1 font-semibold tracking-wide text-ink-faint uppercase">
+        Fit
       </span>
+      <span className="sr-only">{rounded} out of 100</span>
     </div>
   );
-};
+}

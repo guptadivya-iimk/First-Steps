@@ -1,443 +1,297 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import { Header } from "@/components/navigation/Header";
-import { BottomNav } from "@/components/navigation/BottomNav";
-import { DesktopSidebar } from "@/components/navigation/DesktopSidebar";
+import { ArrowLeft, RotateCcw, Minus, Plus, Check } from "lucide-react";
+import { AppShell } from "@/components/navigation/AppShell";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Separator } from "@/components/ui/separator";
+import { usePreferences, DEFAULT_PREFERENCES } from "@/lib/usePreferences";
+import { DEFAULT_WEIGHTS, type Weights } from "@/lib/scoring";
 import {
-  UserWeights,
-  DEFAULT_WEIGHTS,
-  WEIGHT_KEYS,
-  WEIGHT_LABELS,
   getWeightsSum,
   rebalanceWeights,
-  normalizeWeightsToHundred,
-  loadSavedWeights,
-  saveWeightsToStorage,
+  type UserWeights,
 } from "@/lib/scoring/weights";
-import {
-  MapPin,
-  Check,
-  ArrowLeft,
-  RotateCcw,
-  Sparkles,
-  AlertTriangle,
-  CheckCircle2,
-  Sliders,
-  Plus,
-  Minus,
-} from "lucide-react";
+import { Sprout } from "@/components/doodles";
+import { cn } from "@/lib/utils";
+
+/**
+ * The hundred points.
+ *
+ * A parent has a fixed amount of caring to spend, so the five priorities
+ * always add up to 100. Pushing one up pulls the others down in proportion,
+ * which is the only honest way to ask what matters most: everything cannot.
+ * The rebalancing itself lives in `src/lib/scoring/weights.ts`.
+ */
+const WEIGHT_ROWS: {
+  key: keyof Weights;
+  label: string;
+  hint: string;
+  crayon: string;
+}[] = [
+  {
+    key: "montessori",
+    label: "Montessori",
+    hint: "Trained teachers and a real prepared classroom",
+    crayon: "crayon crayon-teal",
+  },
+  {
+    key: "safety",
+    label: "Safety",
+    hint: "CCTV you can watch, women-only toileting staff",
+    crayon: "crayon crayon-coral",
+  },
+  {
+    key: "daycare",
+    label: "Daycare",
+    hint: "Hours past the school day",
+    crayon: "crayon crayon-grape",
+  },
+  {
+    key: "travel",
+    label: "Travel",
+    hint: "Minutes in the cab each morning",
+    crayon: "crayon crayon-sky",
+  },
+  {
+    key: "fees",
+    label: "Fees",
+    hint: "What it costs each month",
+    crayon: "crayon crayon-marigold",
+  },
+];
+
+const BUCKETS = [
+  { value: "low", label: "Under ₹7k" },
+  { value: "medium", label: "₹7k to ₹12k" },
+  { value: "high", label: "Over ₹12k" },
+] as const;
 
 export default function MyNeedsPage() {
-  const [weights, setWeights] = useState<UserWeights>(DEFAULT_WEIGHTS);
-  const [autoRebalance, setAutoRebalance] = useState<boolean>(true);
-  const [savedSuccess, setSavedSuccess] = useState<boolean>(false);
-  const [isClient, setIsClient] = useState<boolean>(false);
+  const { prefs, update } = usePreferences();
+  const total = getWeightsSum(prefs.weights as UserWeights);
+  const balanced = total === 100;
 
-  // Load persisted weights on initial client render
-  useEffect(() => {
-    setIsClient(true);
-    setWeights(loadSavedWeights());
-  }, []);
-
-  const totalSum = getWeightsSum(weights);
-  const isBalanced = totalSum === 100;
-  const difference = 100 - totalSum;
-
-  const handleWeightChange = (key: keyof UserWeights, newValue: number) => {
-    const clamped = Math.max(0, Math.min(100, newValue));
-    if (autoRebalance) {
-      const updated = rebalanceWeights(weights, key, clamped);
-      setWeights(updated);
-    } else {
-      setWeights((prev) => ({ ...prev, [key]: clamped }));
-    }
-    setSavedSuccess(false);
+  /** Move one priority and let the other four give way. */
+  const setWeight = (key: keyof Weights, value: number) => {
+    const next = rebalanceWeights(prefs.weights as UserWeights, key, value);
+    update({ weights: next as Weights });
   };
 
-  const handleStep = (key: keyof UserWeights, delta: number) => {
-    const current = weights[key];
-    handleWeightChange(key, current + delta);
+  const step = (key: keyof Weights, by: number) => {
+    setWeight(key, prefs.weights[key] + by);
   };
 
-  const handleAutoBalanceClick = () => {
-    const normalized = normalizeWeightsToHundred(weights);
-    setWeights(normalized);
-    setSavedSuccess(false);
+  const toggleBucket = (bucket: "low" | "medium" | "high") => {
+    const has = prefs.budgetBuckets.includes(bucket);
+    const next = has
+      ? prefs.budgetBuckets.filter((b) => b !== bucket)
+      : [...prefs.budgetBuckets, bucket];
+    update({ budgetBuckets: next.length ? next : prefs.budgetBuckets });
   };
-
-  const handleResetToDefaults = () => {
-    setWeights({ ...DEFAULT_WEIGHTS });
-    setSavedSuccess(false);
-  };
-
-  const handleSave = () => {
-    const finalWeights = isBalanced ? weights : normalizeWeightsToHundred(weights);
-    setWeights(finalWeights);
-    saveWeightsToStorage(finalWeights);
-    setSavedSuccess(true);
-    setTimeout(() => {
-      setSavedSuccess(false);
-    }, 3000);
-  };
-
-  const presets = [
-    {
-      label: "Default (Balanced Fit)",
-      weights: { montessori: 30, safety: 30, daycare: 15, travel: 15, fees: 10 },
-    },
-    {
-      label: "Commute First (Cab Focus)",
-      weights: { montessori: 20, safety: 25, daycare: 15, travel: 30, fees: 10 },
-    },
-    {
-      label: "Daycare Extended",
-      weights: { montessori: 25, safety: 25, daycare: 30, travel: 10, fees: 10 },
-    },
-  ];
-
-  if (!isClient) {
-    return (
-      <div className="min-h-screen bg-bg flex items-center justify-center">
-        <div className="text-xs text-text-muted">Loading preferences...</div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-bg flex">
-      <DesktopSidebar />
-      <div className="flex-1 flex flex-col min-w-0 pb-20 lg:pb-8">
-        <Header userName="Divya" areaLabel="Sector 47, Gurugram" />
-        <main className="max-w-3xl w-full mx-auto px-4 sm:px-6 py-6">
-          <Link
-            href="/shortlist"
-            className="min-h-touch inline-flex items-center gap-1.5 text-xs font-semibold text-teal-text hover:text-teal-primary mb-4 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to shortlist</span>
+    <AppShell>
+      <div className="mx-auto w-full max-w-2xl px-4 py-5 sm:px-6">
+        <Button asChild variant="ghost" size="sm" className="-ml-2 mb-3">
+          <Link href="/shortlist">
+            <ArrowLeft />
+            All schools
           </Link>
+        </Button>
 
-          <div className="bg-bg-card rounded-card border border-border-light shadow-card p-6 mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1">
-              <h1 className="text-xl sm:text-2xl font-heading font-bold text-text-main">
-                Search Profile & Weight Calibration
-              </h1>
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-chip bg-teal-tint text-teal-text border border-teal-text/20 self-start sm:self-auto">
-                Sector 47 Active
-              </span>
-            </div>
-            <p className="text-xs text-text-muted mb-6">
-              Adjust how much each priority influences school fit scores. All weights must sum to exactly 100%.
-            </p>
+        <h1 className="font-display text-step-8 leading-tight font-extrabold text-ink sm:text-step-9">
+          What matters to you
+        </h1>
+        <p className="mt-1 text-step-3 text-ink-soft">
+          You have a hundred points to spend. Give more to one and the rest give
+          way.
+        </p>
 
-            <div className="space-y-6">
-              {/* Home & Travel Summary */}
-              <div className="p-4 bg-bg rounded-xl border border-border-light space-y-3">
-                <div className="flex items-center gap-2 text-sm font-semibold text-text-main">
-                  <MapPin className="w-4 h-4 text-teal-primary" />
-                  <span>Home & Commute Parameters</span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div>
-                    <span className="text-text-muted block">Home Point:</span>
-                    <span className="font-semibold text-text-main">
-                      Sector 47, Gurugram (Near Malibu Towne)
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-text-muted block">Max Cab Commute:</span>
-                    <span className="font-semibold text-text-main">
-                      20 minutes (Weekday traffic)
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-text-muted block">Morning Drop:</span>
-                    <span className="font-semibold text-text-main">09:00 AM</span>
-                  </div>
-                  <div>
-                    <span className="text-text-muted block">Afternoon Pickup:</span>
-                    <span className="font-semibold text-text-main">01:00 PM</span>
-                  </div>
-                </div>
-              </div>
+        {/* ---- Weights ---- */}
+        <section className="panel mt-5 p-5 sm:p-6">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="font-display text-step-6 font-bold text-ink">
+              Your priorities
+            </h2>
+            <span
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-[var(--radius-chip)] px-2.5 py-1 text-step-2 font-bold tabular-nums",
+                balanced
+                  ? "bg-leaf-pale text-leaf-ink"
+                  : "bg-marigold-pale text-marigold-ink"
+              )}
+            >
+              {balanced && <Check className="size-3.5" />}
+              {total} of 100 spent
+            </span>
+          </div>
 
-              {/* Child Details */}
-              <div className="p-4 bg-bg rounded-xl border border-border-light space-y-2">
-                <span className="text-sm font-semibold text-text-main block">
-                  Child Joining Profile
-                </span>
-                <p className="text-xs text-text-muted">
-                  Daughter joining preschool at{" "}
-                  <span className="font-semibold text-text-main">2.5 years (30 months)</span>.
-                </p>
-              </div>
+          {/* How the hundred points are divided, at a glance. */}
+          <div
+            className="mt-4 flex h-3 overflow-hidden rounded-[var(--radius-chip)] bg-paper-deep"
+            role="img"
+            aria-label={WEIGHT_ROWS.map(
+              (r) => `${r.label} ${prefs.weights[r.key]}`
+            ).join(", ")}
+          >
+            {WEIGHT_ROWS.map((row) => (
+              <span
+                key={row.key}
+                className={cn(row.crayon, "block bg-[var(--crayon)]")}
+                style={{
+                  width: `${(prefs.weights[row.key] / Math.max(total, 1)) * 100}%`,
+                }}
+              />
+            ))}
+          </div>
 
-              {/* Weight Distribution Section */}
-              <div className="p-4 sm:p-5 bg-bg rounded-xl border border-border-light space-y-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <h3 className="text-sm font-heading font-bold text-text-main">
-                      Priority Weightages (Total: 100%)
-                    </h3>
-                    <p className="text-xs text-text-muted">
-                      Use the plus/minus buttons, slider, or type percentages directly.
-                    </p>
-                  </div>
+          <ul className="mt-6 flex flex-col gap-6">
+            {WEIGHT_ROWS.map((row) => (
+              <li key={row.key} className={row.crayon}>
+                <div className="flex items-center justify-between gap-3">
+                  <label
+                    htmlFor={`weight-${row.key}`}
+                    className="text-step-4 font-semibold text-ink"
+                  >
+                    <span className="mr-2 inline-block size-2.5 rounded-full bg-[var(--crayon)] align-middle" />
+                    {row.label}
+                  </label>
 
-                  <div className="flex items-center gap-2">
-                    <button
+                  <span className="flex items-center gap-1">
+                    <Button
                       type="button"
-                      onClick={handleResetToDefaults}
-                      className="min-h-touch inline-flex items-center gap-1.5 px-3 py-1.5 rounded-chip border border-border text-xs font-semibold text-text-muted hover:text-text-main hover:bg-bg-card transition-colors"
-                      title="Reset weights to default 30/30/15/15/10"
+                      variant="outline"
+                      size="icon-sm"
+                      onClick={() => step(row.key, -5)}
+                      disabled={prefs.weights[row.key] <= 0}
+                      aria-label={`Less weight on ${row.label}`}
                     >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      <span>Reset</span>
-                    </button>
-                  </div>
+                      <Minus className="size-4" />
+                    </Button>
+                    <span className="w-10 text-center text-step-4 font-bold tabular-nums text-[var(--crayon-ink)]">
+                      {prefs.weights[row.key]}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-sm"
+                      onClick={() => step(row.key, 5)}
+                      disabled={prefs.weights[row.key] >= 100}
+                      aria-label={`More weight on ${row.label}`}
+                    >
+                      <Plus className="size-4" />
+                    </Button>
+                  </span>
                 </div>
 
-                {/* Total Sum Status Banner */}
-                <div
-                  className={`p-3.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors ${
-                    isBalanced
-                      ? "bg-teal-tint border-teal-text/20 text-teal-text"
-                      : "bg-amber-tint border-amber-text/30 text-amber-text"
+                <p className="mt-0.5 text-step-2 text-ink-faint">{row.hint}</p>
+
+                <Slider
+                  id={`weight-${row.key}`}
+                  className="mt-3"
+                  min={0}
+                  max={100}
+                  step={5}
+                  value={[prefs.weights[row.key]]}
+                  onValueChange={([v]) => setWeight(row.key, v)}
+                  aria-label={`${row.label} importance`}
+                />
+              </li>
+            ))}
+          </ul>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="mt-5 -ml-2"
+            onClick={() => update({ weights: DEFAULT_WEIGHTS })}
+          >
+            <RotateCcw />
+            Back to the defaults
+          </Button>
+        </section>
+
+        {/* ---- Travel ---- */}
+        <section className="panel mt-4 p-5 sm:p-6">
+          <h2 className="font-display text-step-6 font-bold text-ink">
+            The morning cab
+          </h2>
+          <div className="mt-4 flex items-baseline justify-between gap-3">
+            <label
+              htmlFor="max-travel"
+              className="text-step-4 font-semibold text-ink"
+            >
+              Longest ride you would accept
+            </label>
+            <span className="text-step-3 font-semibold tabular-nums text-teal-ink">
+              {prefs.maxTravelMinutes} min
+            </span>
+          </div>
+          <Slider
+            id="max-travel"
+            className="mt-3"
+            min={5}
+            max={45}
+            step={5}
+            value={[prefs.maxTravelMinutes]}
+            onValueChange={([v]) => update({ maxTravelMinutes: v })}
+            aria-label="Longest acceptable cab ride in minutes"
+          />
+          <p className="mt-3 text-step-2 text-ink-faint">
+            Drop-off {prefs.dropTime}, pickup {prefs.pickupTime}, measured on a
+            weekday.
+          </p>
+        </section>
+
+        {/* ---- Budget ---- */}
+        <section className="panel mt-4 p-5 sm:p-6">
+          <h2 className="font-display text-step-6 font-bold text-ink">Budget</h2>
+          <p className="mt-1 text-step-3 text-ink-soft">
+            Pick the ranges you would consider.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {BUCKETS.map((bucket) => {
+              const on = prefs.budgetBuckets.includes(bucket.value);
+              return (
+                <button
+                  key={bucket.value}
+                  type="button"
+                  onClick={() => toggleBucket(bucket.value)}
+                  aria-pressed={on}
+                  className={`min-h-touch rounded-[var(--radius-chip)] border px-4 text-step-3 font-semibold transition-colors ${
+                    on
+                      ? "border-teal bg-teal-pale text-teal-ink"
+                      : "border-line-strong bg-paper-raised text-ink-faint"
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
-                    {isBalanced ? (
-                      <CheckCircle2 className="w-5 h-5 flex-shrink-0 stroke-[2.2]" />
-                    ) : (
-                      <AlertTriangle className="w-5 h-5 flex-shrink-0 stroke-[2.2]" />
-                    )}
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-heading font-bold text-sm">
-                          Total: {totalSum}%
-                        </span>
-                        <span className="text-xs font-medium">
-                          {isBalanced ? "(Strictly Balanced)" : `(Target: 100%)`}
-                        </span>
-                      </div>
-                      <p className="text-xs opacity-90 mt-0.5">
-                        {isBalanced
-                          ? "Your weights sum to exactly 100%. Ready to save."
-                          : difference > 0
-                          ? `You have ${difference}% remaining to assign across categories.`
-                          : `Total exceeds 100% by ${Math.abs(difference)}%. Please reduce weights or auto-balance.`}
-                      </p>
-                    </div>
-                  </div>
-
-                  {!isBalanced && (
-                    <button
-                      type="button"
-                      onClick={handleAutoBalanceClick}
-                      className="min-h-touch inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-btn bg-white border border-amber-text/40 text-xs font-bold text-amber-text hover:bg-amber-tint transition-colors shadow-sm self-start sm:self-auto"
-                    >
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>Auto-balance to 100%</span>
-                    </button>
-                  )}
-                </div>
-
-                {/* Visual Segmented Distribution Bar */}
-                <div>
-                  <div className="flex justify-between text-[11px] text-text-muted mb-1 font-medium">
-                    <span>Distribution Bar</span>
-                    <span>100% Allocated</span>
-                  </div>
-                  <div className="w-full h-3 bg-border-light rounded-full overflow-hidden flex shadow-inner">
-                    {WEIGHT_KEYS.map((key) => {
-                      const share = weights[key];
-                      if (share <= 0) return null;
-                      return (
-                        <div
-                          key={key}
-                          style={{
-                            width: `${(share / Math.max(100, totalSum)) * 100}%`,
-                            backgroundColor: WEIGHT_LABELS[key].color,
-                          }}
-                          className="h-full transition-all duration-300"
-                          title={`${WEIGHT_LABELS[key].title}: ${share}%`}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Auto-rebalance Mode Toggle */}
-                <div className="flex items-center justify-between p-3 bg-bg-card rounded-xl border border-border-light">
-                  <div className="flex items-center gap-2">
-                    <Sliders className="w-4 h-4 text-teal-primary" />
-                    <div>
-                      <span className="text-xs font-semibold text-text-main block">
-                        Auto-rebalance other weights while sliding
-                      </span>
-                      <span className="text-[11px] text-text-muted">
-                        Automatically adjusts remaining categories proportionally so sum stays 100.
-                      </span>
-                    </div>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={autoRebalance}
-                      onChange={(e) => setAutoRebalance(e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-9 h-5 bg-border-light peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-primary"></div>
-                  </label>
-                </div>
-
-                {/* 5 Categories Inputs */}
-                <div className="space-y-4 pt-1">
-                  {WEIGHT_KEYS.map((key) => {
-                    const info = WEIGHT_LABELS[key];
-                    const val = weights[key];
-
-                    return (
-                      <div
-                        key={key}
-                        className="p-3.5 bg-bg-card rounded-card border border-border-light shadow-sm"
-                      >
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <div className="flex items-start gap-2">
-                            <span
-                              className="w-3 h-3 rounded-full mt-1 flex-shrink-0"
-                              style={{ backgroundColor: info.color }}
-                            />
-                            <div>
-                              <span className="text-xs font-bold text-text-main block">
-                                {info.title}
-                              </span>
-                              <span className="text-[11px] text-text-muted">
-                                {info.desc}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Direct Number Input */}
-                          <div className="flex items-center gap-1">
-                            <input
-                              type="number"
-                              min="0"
-                              max="100"
-                              step="5"
-                              value={val}
-                              onChange={(e) =>
-                                handleWeightChange(key, Number(e.target.value))
-                              }
-                              className="w-14 h-8 px-1 text-center font-heading font-bold text-sm rounded-lg border border-border focus:ring-1 focus:ring-teal-primary focus:outline-none bg-bg"
-                            />
-                            <span className="text-xs font-semibold text-text-muted">
-                              %
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Interactive Row: Minus Button, Slider, Plus Button */}
-                        <div className="flex items-center gap-2 pt-1">
-                          <button
-                            type="button"
-                            onClick={() => handleStep(key, -5)}
-                            disabled={val <= 0}
-                            className="min-h-touch min-w-touch flex items-center justify-center rounded-btn border border-border bg-bg text-text-main hover:bg-border-light active:bg-border disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                            aria-label={`Decrease ${info.title} by 5%`}
-                          >
-                            <Minus className="w-4 h-4" />
-                          </button>
-
-                          <div className="flex-1 px-1">
-                            <input
-                              type="range"
-                              min="0"
-                              max="100"
-                              step="5"
-                              value={val}
-                              onChange={(e) =>
-                                handleWeightChange(key, Number(e.target.value))
-                              }
-                              className="w-full h-2 rounded-lg accent-teal-primary cursor-pointer"
-                              aria-label={info.title}
-                            />
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => handleStep(key, 5)}
-                            disabled={val >= 100}
-                            className="min-h-touch min-w-touch flex items-center justify-center rounded-btn border border-border bg-bg text-text-main hover:bg-border-light active:bg-border disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                            aria-label={`Increase ${info.title} by 5%`}
-                          >
-                            <Plus className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Quick Presets */}
-                <div className="pt-2">
-                  <span className="text-xs font-semibold text-text-muted block mb-2">
-                    Quick Preset Profiles:
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {presets.map((p) => (
-                      <button
-                        key={p.label}
-                        type="button"
-                        onClick={() => {
-                          setWeights(p.weights);
-                          setSavedSuccess(false);
-                        }}
-                        className="min-h-touch px-3 py-1.5 rounded-chip text-xs font-medium border border-border bg-bg-card hover:border-teal-primary hover:text-teal-primary transition-colors"
-                      >
-                        {p.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Save Action Footer */}
-            <div className="mt-6 pt-4 border-t border-border-light flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                {savedSuccess && (
-                  <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-text bg-teal-tint px-3 py-1.5 rounded-chip border border-teal-text/20">
-                    <Check className="w-4 h-4" />
-                    <span>Preferences saved! Fit scores updated.</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Link
-                  href="/shortlist"
-                  className="min-h-touch inline-flex items-center px-4 py-2.5 rounded-btn border border-border text-xs font-semibold text-text-main hover:bg-bg transition-colors"
-                >
-                  Cancel
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  className="min-h-touch inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-btn bg-teal-primary hover:bg-teal-hover active:bg-teal-hover text-white text-xs font-semibold shadow-sm transition-colors cursor-pointer"
-                >
-                  <Check className="w-4 h-4" />
-                  <span>Save & Recompute Scores</span>
+                  {bucket.label}
                 </button>
-              </div>
-            </div>
+              );
+            })}
           </div>
-        </main>
+        </section>
+
+        <Separator className="my-6 bg-line" />
+
+        <p className="flex items-center gap-2.5 text-step-2 text-ink-faint">
+          <Sprout className="size-6 shrink-0" />
+          Saved on this device as you go. Nothing leaves your phone.
+        </p>
+
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="mt-2 -ml-2 text-ink-faint"
+          onClick={() => update(DEFAULT_PREFERENCES)}
+        >
+          Reset everything
+        </Button>
       </div>
-      <BottomNav />
-    </div>
+    </AppShell>
   );
 }

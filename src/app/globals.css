@@ -1,26 +1,478 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* ===========================================================================
+   FirstSteps Finder — "Playground paper"
+   Warm paper ground, calm teal brand, marigold for warmth.
+   Every colour is OKLCH. Every font size lands on a step of the ramp below.
+   =========================================================================== */
 
 :root {
-  --background: #F6F7F4;
-  --foreground: #17262A;
+  /* --- Surfaces ------------------------------------------------------- */
+  --paper: oklch(97.8% 0.012 182);
+  --paper-deep: oklch(95.4% 0.018 182);
+  --paper-raised: oklch(99.4% 0.004 182);
+
+  /* --- Ink ------------------------------------------------------------ */
+  --ink: oklch(26% 0.03 205);
+  --ink-soft: oklch(44% 0.022 205);
+  --ink-faint: oklch(51% 0.018 205);
+  --ink-disabled: oklch(64% 0.014 205);
+
+  /* --- Rules ---------------------------------------------------------- */
+  --line: oklch(26% 0.03 205 / 0.14);
+  --line-strong: oklch(26% 0.03 205 / 0.26);
+
+  /* --- Brand: teal ---------------------------------------------------- */
+  --teal: oklch(50% 0.088 190);
+  --teal-deep: oklch(42% 0.082 190);
+  --teal-pale: oklch(94.5% 0.028 190);
+  --teal-ink: oklch(38% 0.078 190);
+
+  /* --- Warmth: marigold ----------------------------------------------- */
+  --marigold: oklch(80% 0.145 72);
+  --marigold-pale: oklch(95.5% 0.045 78);
+  --marigold-ink: oklch(42% 0.1 62);
+
+  /* --- Spot colours (small moments only) ------------------------------ */
+  --sky: oklch(74% 0.1 232);
+  --sky-pale: oklch(95.5% 0.032 232);
+  --sky-ink: oklch(42% 0.11 248);
+
+  --blossom: oklch(78% 0.095 12);
+  --blossom-pale: oklch(95.5% 0.028 12);
+  --blossom-ink: oklch(43% 0.125 15);
+
+  --leaf: oklch(74% 0.125 148);
+  --leaf-pale: oklch(95.5% 0.035 148);
+  --leaf-ink: oklch(40% 0.095 150);
+
+  --lilac: oklch(76% 0.085 300);
+  --lilac-pale: oklch(95.5% 0.028 300);
+  --lilac-ink: oklch(42% 0.105 300);
+
+  --coral: oklch(70% 0.17 18);
+  --coral-pale: oklch(95.5% 0.035 18);
+  --coral-ink: oklch(45% 0.16 18);
+
+  --grape: oklch(62% 0.15 305);
+  --grape-pale: oklch(95.5% 0.03 305);
+  --grape-ink: oklch(42% 0.14 305);
+
+  /* --- Radius --------------------------------------------------------- */
+  --radius: 1.25rem;
+
+  /* --- shadcn token bridge -------------------------------------------- */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--paper-raised);
+  --card-foreground: var(--ink);
+  --popover: var(--paper-raised);
+  --popover-foreground: var(--ink);
+  --primary: var(--teal);
+  --primary-foreground: oklch(99% 0.006 88);
+  --secondary: var(--teal-pale);
+  --secondary-foreground: var(--teal-ink);
+  --muted: var(--paper-deep);
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--marigold-pale);
+  --accent-foreground: var(--marigold-ink);
+  --destructive: oklch(57% 0.185 27);
+  --destructive-foreground: oklch(99% 0.006 88);
+  --border: var(--line);
+  --input: var(--line-strong);
+  --ring: var(--teal);
 }
 
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-dm-sans), sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@theme inline {
+  /* Surfaces */
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-paper-raised: var(--paper-raised);
+
+  /* Ink */
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-ink-disabled: var(--ink-disabled);
+
+  /* Rules */
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  /* Brand + accents */
+  --color-teal: var(--teal);
+  --color-teal-deep: var(--teal-deep);
+  --color-teal-pale: var(--teal-pale);
+  --color-teal-ink: var(--teal-ink);
+
+  --color-marigold: var(--marigold);
+  --color-marigold-pale: var(--marigold-pale);
+  --color-marigold-ink: var(--marigold-ink);
+
+  --color-sky: var(--sky);
+  --color-sky-pale: var(--sky-pale);
+  --color-sky-ink: var(--sky-ink);
+
+  --color-blossom: var(--blossom);
+  --color-blossom-pale: var(--blossom-pale);
+  --color-blossom-ink: var(--blossom-ink);
+
+  --color-leaf: var(--leaf);
+  --color-leaf-pale: var(--leaf-pale);
+  --color-leaf-ink: var(--leaf-ink);
+
+  --color-lilac: var(--lilac);
+  --color-lilac-pale: var(--lilac-pale);
+  --color-lilac-ink: var(--lilac-ink);
+
+  --color-coral: var(--coral);
+  --color-coral-pale: var(--coral-pale);
+  --color-coral-ink: var(--coral-ink);
+
+  --color-grape: var(--grape);
+  --color-grape-pale: var(--grape-pale);
+  --color-grape-ink: var(--grape-ink);
+
+  /* shadcn bridge */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Fonts */
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* -------------------------------------------------------------------
+     Type ramp. Eleven steps, nothing between them. Adding a step is a
+     design decision; reaching for an arbitrary size is not.
+     ------------------------------------------------------------------- */
+  --text-step-1: 0.6875rem;   /* 11px — eyebrow, chip */
+  --text-step-2: 0.75rem;     /* 12px — meta, caption */
+  --text-step-3: 0.8125rem;   /* 13px — secondary UI */
+  --text-step-4: 0.875rem;    /* 14px — dense body, controls */
+  --text-step-5: 1rem;        /* 16px — body */
+  --text-step-6: 1.125rem;    /* 18px — lead, card title */
+  --text-step-7: 1.3125rem;   /* 21px — panel title */
+  --text-step-8: 1.625rem;    /* 26px — section head */
+  --text-step-9: 2rem;        /* 32px — page title */
+  --text-step-10: 2.5rem;     /* 40px — sub-display */
+  --text-step-11: 3.25rem;    /* 52px — hero display */
+
+  /* Radii */
+  --radius-chip: 999px;
+  --radius-btn: 0.875rem;
+  --radius-card: 1.25rem;
+  --radius-sm: calc(var(--radius) - 8px);
+  --radius-md: calc(var(--radius) - 6px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* The only two shadows in the system */
+  --shadow-rest: 0 1px 2px oklch(26% 0.03 205 / 0.05);
+  --shadow-lift: 0 1px 2px oklch(26% 0.03 205 / 0.05),
+    0 10px 28px -14px oklch(26% 0.03 205 / 0.22);
+
+  /* Touch targets */
+  --spacing-touch: 2.75rem;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-bricolage), sans-serif;
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-step-5);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Focus is a ring, always visible, never removed. */
+  :focus-visible {
+    outline: 2px solid var(--teal);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--marigold-pale);
+    color: var(--marigold-ink);
+  }
 }
 
-/* Ensure minimum touch target for accessibility */
-.touch-target {
-  min-height: 44px;
-  min-width: 44px;
+@layer components {
+  /* ------------------------------------------------------------------
+     The crayon box.
+
+     Six colours. Each school is given one, by name, and keeps it
+     everywhere: its card edge, its monogram tile, its pin on the map.
+     That is what makes the product colourful without making it noisy,
+     because the colour is carrying information rather than decoration.
+     ------------------------------------------------------------------ */
+  .crayon {
+    --crayon: var(--teal);
+    --crayon-pale: var(--teal-pale);
+    --crayon-ink: var(--teal-ink);
+  }
+  .crayon-teal {
+    --crayon: var(--teal);
+    --crayon-pale: var(--teal-pale);
+    --crayon-ink: var(--teal-ink);
+  }
+  .crayon-marigold {
+    --crayon: var(--marigold);
+    --crayon-pale: var(--marigold-pale);
+    --crayon-ink: var(--marigold-ink);
+  }
+  .crayon-coral {
+    --crayon: var(--coral);
+    --crayon-pale: var(--coral-pale);
+    --crayon-ink: var(--coral-ink);
+  }
+  .crayon-sky {
+    --crayon: var(--sky);
+    --crayon-pale: var(--sky-pale);
+    --crayon-ink: var(--sky-ink);
+  }
+  .crayon-grape {
+    --crayon: var(--grape);
+    --crayon-pale: var(--grape-pale);
+    --crayon-ink: var(--grape-ink);
+  }
+  .crayon-leaf {
+    --crayon: var(--leaf);
+    --crayon-pale: var(--leaf-pale);
+    --crayon-ink: var(--leaf-ink);
+  }
+
+  /* A card that wears its school's colour as a wash rather than a stripe.
+     The colour arrives through the mark tile, the sector label and this soft
+     tint at the head of the card, which keeps the corners clean. */
+  .panel-crayon {
+    position: relative;
+    background:
+      linear-gradient(
+        to bottom,
+        color-mix(
+            in oklch,
+            var(--crayon-pale, var(--teal-pale)) 85%,
+            transparent
+          )
+          0,
+        transparent 112px
+      ),
+      var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-rest);
+  }
+
+  /* The six-colour rule that runs under the app header. */
+  .rainbow-rule {
+    height: 3px;
+    background: linear-gradient(
+      to right,
+      var(--teal) 0 16.6%,
+      var(--leaf) 16.6% 33.3%,
+      var(--marigold) 33.3% 50%,
+      var(--coral) 50% 66.6%,
+      var(--grape) 66.6% 83.3%,
+      var(--sky) 83.3% 100%
+    );
+  }
+
+  /* A soft paper panel. Cards rest on a hairline, not a drop shadow. */
+  .panel {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-rest);
+  }
+
+  /* A marigold highlighter stroke through a word, drawn behind the glyphs.
+     One per page, at most. */
+  .crayon-underline {
+    background-image: linear-gradient(
+      to top,
+      oklch(80% 0.145 72 / 0.45) 0.36em,
+      transparent 0.36em
+    );
+    background-repeat: no-repeat;
+    padding-inline: 0.08em;
+  }
+}
+
+@layer utilities {
+  /* Paper texture: a very faint dotted grid, like squared exercise paper. */
+  .paper-grid {
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      oklch(26% 0.03 205 / 0.06) 1px,
+      transparent 0
+    );
+    background-size: 22px 22px;
+  }
+
+  .text-step-1 { font-size: var(--text-step-1); }
+  .text-step-2 { font-size: var(--text-step-2); }
+  .text-step-3 { font-size: var(--text-step-3); }
+  .text-step-4 { font-size: var(--text-step-4); }
+  .text-step-5 { font-size: var(--text-step-5); }
+  .text-step-6 { font-size: var(--text-step-6); }
+  .text-step-7 { font-size: var(--text-step-7); }
+  .text-step-8 { font-size: var(--text-step-8); }
+  .text-step-9 { font-size: var(--text-step-9); }
+  .text-step-10 { font-size: var(--text-step-10); }
+  .text-step-11 { font-size: var(--text-step-11); }
+}
+
+/* ---------------------------------------------------------------------------
+   Map pins.
+
+   Leaflet writes its own markup, so these styles live outside the Tailwind
+   layers and are addressed by class. A pin is a rounded teardrop carrying the
+   school's fit score in its own crayon colour.
+   --------------------------------------------------------------------------- */
+.firststeps-pin {
+  background: none;
+  border: 0;
+}
+
+.firststeps-pin-shape {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px 999px 999px 4px;
+  transform: rotate(-45deg);
+  background: var(--pin, var(--teal));
+  border: 2px solid oklch(100% 0 0 / 0.9);
+  box-shadow: 0 4px 10px -2px oklch(26% 0.03 205 / 0.4);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.firststeps-pin-score {
+  transform: rotate(45deg);
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: oklch(100% 0 0);
+  line-height: 1;
+}
+
+.firststeps-pin:hover .firststeps-pin-shape,
+.firststeps-pin:focus-visible .firststeps-pin-shape {
+  transform: rotate(-45deg) scale(1.1);
+}
+
+.firststeps-pin.is-selected {
+  z-index: 1000 !important;
+}
+
+.firststeps-pin.is-selected .firststeps-pin-shape {
+  transform: rotate(-45deg) scale(1.25);
+  box-shadow: 0 0 0 5px oklch(26% 0.03 205 / 0.14),
+    0 6px 14px -2px oklch(26% 0.03 205 / 0.45);
+}
+
+/* OpenStreetMap tiles arrive fully saturated. Mute them so the roads read as
+   context and the pins keep the colour. */
+.firststeps-tiles {
+  filter: saturate(0.55) brightness(1.06) contrast(0.92);
+}
+
+/* Leaflet's own chrome, brought into the system. */
+.leaflet-container {
+  font-family: var(--font-sans), sans-serif;
+  background: var(--paper-deep);
+}
+
+.leaflet-control-attribution {
+  background: oklch(100% 0 0 / 0.86) !important;
+  font-size: 0.75rem !important;
+  padding: 3px 7px !important;
+  color: var(--ink-faint) !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--teal-ink) !important;
+}
+
+.leaflet-bar a {
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+
+.leaflet-tooltip {
+  border: 1px solid var(--line) !important;
+  border-radius: 10px !important;
+  box-shadow: var(--shadow-rest) !important;
+  color: var(--ink) !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+}
+
+/* A single gentle motion, for playful marks only. Switched off for anyone
+   who has asked their system to reduce motion. */
+@keyframes sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+.sway {
+  animation: sway 4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

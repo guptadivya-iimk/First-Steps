@@ -14,8 +14,9 @@ The app tracks source-verified Montessori and safety credentials, checks cab com
 
 ## Technology Stack
 
-- Frontend: Next.js (App Router), React 19, TypeScript, Tailwind CSS
-- Design System: Custom tokens, Bricolage Grotesque and DM Sans typography, Lucide stroke icons (no emojis)
+- Frontend: Next.js (App Router), React 19, TypeScript, Tailwind CSS v4
+- UI components: shadcn/ui on Radix primitives, in `src/components/ui`
+- Design System: OKLCH tokens in `src/app/globals.css`, an eleven-step type ramp, Bricolage Grotesque and DM Sans, Lucide stroke icons and hand-drawn SVG doodles (no emojis)
 - Backend: Firebase Auth (Google Sign-In), Cloud Firestore (`asia-south2`/`asia-south1`), Cloud Storage
 - AI: Google Gemini API (Flash and Pro models) with Google Search grounding and Zod validation
 - Maps: Google Maps Platform (Places API New, Routes API, Maps JavaScript API)
@@ -57,6 +58,47 @@ The app tracks source-verified Montessori and safety credentials, checks cab com
    ```bash
    npm test
    ```
+
+6. Run the browser tests:
+   ```bash
+   npm run test:e2e
+   ```
+
+## The Atlas
+
+The shortlist has two views, List and Atlas. The Atlas pins every matching
+school on a real map of Gurugram, each pin carrying its own fit score in the
+school's colour. Tapping a pin opens a card for that school; the map button on
+a list card jumps the other way.
+
+Tiles come from OpenStreetMap, which needs no API key, and are muted with a CSS
+filter so the pins carry the colour. Before this goes anywhere near real
+traffic, move to a tile host with a usage agreement (Mapbox, MapTiler or a
+self-hosted set); OpenStreetMap's own tiles are not for production volume.
+
+## Design
+
+The visual system lives entirely in `src/app/globals.css`. Colours are OKLCH,
+every font size lands on one of eleven ramp steps, and cards rest on a hairline
+rather than a drop shadow.
+
+Colour carries information rather than decoration. Two systems run side by side:
+
+- **Provenance colours.** Teal means a school confirmed a fact, sky means its
+  website said so, marigold means check it yourself, lilac means nobody knows.
+- **The crayon box.** Six colours, one of which is assigned to each school by
+  its id in `src/lib/schoolIdentity.ts`. A school keeps its colour and its
+  hand-drawn mark everywhere: the card, the comparison table, its map pin. That
+  is what lets a parent follow one school across the product by sight.
+
+Layout is mobile first. Phones and tablets get a bottom bar under the thumb,
+laptops get a rail on the left. Every interactive target is at least 44px.
+
+Run the design checks against a running dev server:
+
+```bash
+npx impeccable detect http://localhost:3000/shortlist
+```
 
 ## Development Phases
 

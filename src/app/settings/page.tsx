@@ -2,122 +2,112 @@
 
 import React from "react";
 import Link from "next/link";
-import { Header } from "@/components/navigation/Header";
-import { BottomNav } from "@/components/navigation/BottomNav";
-import { DesktopSidebar } from "@/components/navigation/DesktopSidebar";
-import { User, Download, Trash2, Shield, ArrowLeft } from "lucide-react";
+import { Download, Trash2, ShieldCheck, ArrowLeft } from "lucide-react";
+import { AppShell } from "@/components/navigation/AppShell";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { usePreferences, DEFAULT_PREFERENCES } from "@/lib/usePreferences";
 
 export default function SettingsPage() {
+  const { prefs, update } = usePreferences();
+  const [cleared, setCleared] = React.useState(false);
+
   const handleExport = () => {
-    const dataStr =
-      "data:text/json;charset=utf-8," +
-      encodeURIComponent(
-        JSON.stringify(
-          {
-            user: "Divya",
-            home: "Sector 47, Gurugram",
-            childAgeMonths: 30,
-            exportedAt: new Date().toISOString(),
-          },
-          null,
-          2
-        )
-      );
-    const downloadAnchor = document.createElement("a");
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", "firststeps-data.json");
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
+    const blob = new Blob([JSON.stringify(prefs, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "firststeps-data.json";
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleClear = () => {
+    try {
+      window.localStorage.removeItem("firststeps_preferences");
+      window.localStorage.removeItem("firststeps_consent");
+    } catch {
+      // Nothing to clear if the store is unavailable.
+    }
+    update(DEFAULT_PREFERENCES);
+    setCleared(true);
   };
 
   return (
-    <div className="min-h-screen bg-bg flex">
-      <DesktopSidebar />
-      <div className="flex-1 flex flex-col min-w-0 pb-20 lg:pb-8">
-        <Header userName="Divya" areaLabel="Sector 47, Gurugram" />
-        <main className="max-w-3xl w-full mx-auto px-4 sm:px-6 py-6">
-          <Link
-            href="/shortlist"
-            className="min-h-touch inline-flex items-center gap-1.5 text-xs font-semibold text-teal-text hover:text-teal-primary mb-4 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to shortlist</span>
+    <AppShell>
+      <div className="mx-auto w-full max-w-2xl px-4 py-5 sm:px-6">
+        <Button asChild variant="ghost" size="sm" className="-ml-2 mb-3">
+          <Link href="/shortlist">
+            <ArrowLeft />
+            All schools
           </Link>
+        </Button>
 
-          <div className="bg-bg-card rounded-card border border-border-light shadow-card p-6 mb-6">
-            <h1 className="text-xl sm:text-2xl font-heading font-bold text-text-main mb-1">
-              Account & Privacy Controls
-            </h1>
-            <p className="text-xs text-text-muted mb-6">
-              Manage your personal data in compliance with India&apos;s DPDP Act.
-            </p>
+        <h1 className="font-display text-step-8 leading-tight font-extrabold text-ink sm:text-step-9">
+          Your data
+        </h1>
+        <p className="mt-1 text-step-3 text-ink-soft">
+          We hold a search area and a list of schools. That is the whole file.
+        </p>
 
-            <div className="space-y-4">
-              <div className="p-4 bg-bg rounded-xl border border-border-light flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-teal-tint text-teal-text flex items-center justify-center font-bold">
-                    <User className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <span className="text-sm font-semibold text-text-main block">
-                      Divya Gupta
-                    </span>
-                    <span className="text-xs text-text-muted">
-                      gupta.divyaIIMK@gmail.com
-                    </span>
-                  </div>
-                </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-chip bg-teal-tint text-teal-text border border-teal-text/20">
-                  Parent Account
-                </span>
-              </div>
-
-              <div className="p-4 bg-bg rounded-xl border border-border-light flex items-center justify-between">
-                <div>
-                  <span className="text-sm font-semibold text-text-main block">
-                    Export My Data
-                  </span>
-                  <span className="text-xs text-text-muted">
-                    Download a full JSON record of your search profile, shortlist, and notes.
-                  </span>
-                </div>
-                <button
-                  onClick={handleExport}
-                  className="min-h-touch inline-flex items-center gap-1.5 px-3.5 py-2 rounded-btn border border-border text-xs font-semibold text-text-main hover:bg-bg-card transition-colors"
-                >
-                  <Download className="w-4 h-4 text-teal-primary" />
-                  <span>Export</span>
-                </button>
-              </div>
-
-              <div className="p-4 bg-amber-tint/40 rounded-xl border border-amber-text/20 flex items-center justify-between">
-                <div>
-                  <span className="text-sm font-semibold text-amber-text block">
-                    Delete Account & All Data
-                  </span>
-                  <span className="text-xs text-text-muted">
-                    Permanently delete your profile, preferences, and saved school facts.
-                  </span>
-                </div>
-                <button
-                  onClick={() => {
-                    if (confirm("Are you sure you want to delete your account? All data will be erased.")) {
-                      localStorage.clear();
-                      window.location.href = "/";
-                    }
-                  }}
-                  className="min-h-touch inline-flex items-center gap-1.5 px-3.5 py-2 rounded-btn border border-amber-text/40 bg-white text-xs font-semibold text-amber-text hover:bg-amber-tint transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  <span>Delete</span>
-                </button>
-              </div>
+        <section className="panel mt-5 p-5 sm:p-6">
+          <dl className="flex flex-col gap-3 text-step-3">
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-soft">Searching from</dt>
+              <dd className="font-semibold text-ink">Sector 47, Gurugram</dd>
             </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-soft">Schools saved</dt>
+              <dd className="font-semibold text-ink">
+                {prefs.shortlisted.length}
+              </dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-soft">Your name</dt>
+              <dd className="font-semibold text-ink-faint">Not stored</dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-soft">Your child</dt>
+              <dd className="font-semibold text-ink-faint">Not stored</dd>
+            </div>
+          </dl>
+
+          <Separator className="my-5 bg-line" />
+
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button type="button" variant="outline" onClick={handleExport}>
+              <Download />
+              Download my data
+            </Button>
+            <Button type="button" variant="destructive" onClick={handleClear}>
+              <Trash2 />
+              Delete everything
+            </Button>
           </div>
-        </main>
+
+          {cleared && (
+            <p className="mt-3 text-step-3 font-semibold text-teal-ink">
+              Done. Nothing about you is stored on this device now.
+            </p>
+          )}
+        </section>
+
+        <section className="panel mt-4 flex items-start gap-3 p-5">
+          <ShieldCheck className="mt-0.5 size-5 shrink-0 text-teal" />
+          <p className="text-step-3 leading-relaxed text-ink-soft">
+            Your name and your child&apos;s details never leave your device, so
+            there is nothing here to identify either of you.{" "}
+            <Link
+              href="/privacy"
+              className="font-semibold text-teal-ink hover:underline"
+            >
+              Read the policy
+            </Link>
+          </p>
+        </section>
       </div>
-      <BottomNav />
-    </div>
+    </AppShell>
   );
 }

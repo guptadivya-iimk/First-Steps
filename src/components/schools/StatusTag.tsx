@@ -1,78 +1,43 @@
-import React from "react";
+import * as React from "react";
 import { FactStatus } from "@/lib/types";
-import { CheckCircle2, Globe, AlertTriangle, HelpCircle, Clock } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  CheckCircle2,
+  Globe,
+  AlertTriangle,
+  HelpCircle,
+  Clock,
+} from "lucide-react";
 
-interface StatusTagProps {
-  status: FactStatus;
-  customText?: string;
-  size?: "sm" | "md";
-}
+type Variant = React.ComponentProps<typeof Badge>["variant"];
 
-export const StatusTag: React.FC<StatusTagProps> = ({
+const MAP: Record<
+  FactStatus,
+  { label: string; variant: Variant; Icon: typeof CheckCircle2 }
+> = {
+  confirmed: { label: "School confirmed", variant: "default", Icon: CheckCircle2 },
+  website: { label: "School website", variant: "website", Icon: Globe },
+  listing: { label: "Listing site", variant: "warn", Icon: Clock },
+  conflicting: { label: "Sources disagree", variant: "warn", Icon: AlertTriangle },
+  old: { label: "Might be old", variant: "warn", Icon: Clock },
+  unknown: { label: "Worth asking", variant: "ask", Icon: HelpCircle },
+};
+
+export function StatusTag({
   status,
   customText,
-  size = "sm",
-}) => {
-  const sizeClasses =
-    size === "sm"
-      ? "text-xs px-2.5 py-1 gap-1.5"
-      : "text-sm px-3 py-1.5 gap-2";
+  className,
+}: {
+  status: FactStatus;
+  customText?: string;
+  className?: string;
+}) {
+  const { label, variant, Icon } = MAP[status] ?? MAP.unknown;
 
-  switch (status) {
-    case "confirmed":
-      return (
-        <span
-          className={`inline-flex items-center font-medium rounded-chip bg-teal-tint text-teal-text border border-teal-text/20 ${sizeClasses}`}
-        >
-          <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.2]" />
-          <span>{customText || "Confirmed by school"}</span>
-        </span>
-      );
-    case "website":
-      return (
-        <span
-          className={`inline-flex items-center font-medium rounded-chip bg-teal-tint text-teal-text border border-teal-text/20 ${sizeClasses}`}
-        >
-          <Globe className="w-3.5 h-3.5 stroke-[2]" />
-          <span>{customText || "From school website"}</span>
-        </span>
-      );
-    case "listing":
-      return (
-        <span
-          className={`inline-flex items-center font-medium rounded-chip bg-amber-tint text-amber-text border border-amber-text/20 ${sizeClasses}`}
-        >
-          <Clock className="w-3.5 h-3.5 stroke-[2]" />
-          <span>{customText || "From listing site"}</span>
-        </span>
-      );
-    case "conflicting":
-      return (
-        <span
-          className={`inline-flex items-center font-medium rounded-chip bg-amber-tint text-amber-text border border-amber-text/20 ${sizeClasses}`}
-        >
-          <AlertTriangle className="w-3.5 h-3.5 stroke-[2.2]" />
-          <span>{customText || "Conflicting"}</span>
-        </span>
-      );
-    case "old":
-      return (
-        <span
-          className={`inline-flex items-center font-medium rounded-chip bg-amber-tint text-amber-text border border-amber-text/20 ${sizeClasses}`}
-        >
-          <Clock className="w-3.5 h-3.5 stroke-[2]" />
-          <span>{customText || "Old data"}</span>
-        </span>
-      );
-    case "unknown":
-    default:
-      return (
-        <span
-          className={`inline-flex items-center font-medium rounded-chip bg-blue-tint text-blue-text border border-blue-text/20 ${sizeClasses}`}
-        >
-          <HelpCircle className="w-3.5 h-3.5 stroke-[2]" />
-          <span>{customText || "Ask school"}</span>
-        </span>
-      );
-  }
-};
+  return (
+    <Badge variant={variant} className={className}>
+      <Icon />
+      <span>{customText || label}</span>
+    </Badge>
+  );
+}

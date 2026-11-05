@@ -2,72 +2,78 @@
 
 import React from "react";
 import Link from "next/link";
-import { Header } from "@/components/navigation/Header";
-import { BottomNav } from "@/components/navigation/BottomNav";
-import { DesktopSidebar } from "@/components/navigation/DesktopSidebar";
 import { CalendarCheck, ArrowRight } from "lucide-react";
+import { AppShell } from "@/components/navigation/AppShell";
+import { Button } from "@/components/ui/button";
+import { usePreferences } from "@/lib/usePreferences";
+import { Kite } from "@/components/doodles";
+
+const STAGES = [
+  { label: "To ask", tone: "bg-paper-deep text-ink-soft" },
+  { label: "Asked", tone: "bg-sky-pale text-sky-ink" },
+  { label: "Replied", tone: "bg-teal-pale text-teal-ink" },
+  { label: "Visiting", tone: "bg-marigold-pale text-marigold-ink" },
+  { label: "Visited", tone: "bg-lilac-pale text-lilac-ink" },
+  { label: "Decided", tone: "bg-leaf-pale text-leaf-ink" },
+];
 
 export default function VisitsPage() {
-  const stages = [
-    { label: "To Ask", count: 8 },
-    { label: "Asked", count: 2 },
-    { label: "Replied", count: 1 },
-    { label: "Visit Booked", count: 1 },
-    { label: "Visited", count: 0 },
-    { label: "Decided", count: 0 },
-  ];
+  const { prefs, loaded } = usePreferences();
+  const saved = prefs.shortlisted.length;
 
   return (
-    <div className="min-h-screen bg-bg flex">
-      <DesktopSidebar />
-      <div className="flex-1 flex flex-col min-w-0 pb-20 lg:pb-8">
-        <Header userName="Divya" areaLabel="Sector 47, Gurugram" />
-        <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-heading font-bold text-text-main">
-              Visits & Pipeline Tracker
-            </h1>
-            <p className="text-xs text-text-muted mt-0.5">
-              Track outreach, manage scheduled morning campus tours, and log visit notes.
-            </p>
-          </div>
+    <AppShell>
+      <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6">
+        <h1 className="font-display text-step-8 leading-tight font-extrabold text-ink sm:text-step-9">
+          Visits
+        </h1>
+        <p className="mt-1 text-step-3 text-ink-soft">
+          Where each school has got to.
+        </p>
 
-          {/* Stage Counters Bar */}
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-6">
-            {stages.map((stage) => (
-              <div
-                key={stage.label}
-                className="bg-bg-card rounded-card border border-border-light p-3 text-center shadow-card"
-              >
-                <span className="text-xl font-heading font-bold text-teal-text block">
-                  {stage.count}
-                </span>
-                <span className="text-[11px] font-medium text-text-muted">
-                  {stage.label}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <div className="bg-bg-card rounded-card border border-border-light shadow-card p-6 text-center">
-            <CalendarCheck className="w-10 h-10 text-teal-primary mx-auto mb-3 stroke-[1.8]" />
-            <h2 className="text-sm font-semibold text-text-main mb-1">
-              Upcoming Visit: Productive Minds Montessori
-            </h2>
-            <p className="text-xs text-text-muted max-w-sm mx-auto mb-4">
-              Scheduled tour on Thursday at 10:30 AM (Green St, Malibu Towne, Sector 47).
-            </p>
-            <Link
-              href="/shortlist"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-btn bg-teal-primary text-white text-xs font-semibold hover:bg-teal-hover transition-colors"
+        <ol className="mt-6 grid grid-cols-3 gap-2 sm:grid-cols-6">
+          {STAGES.map((stage, i) => (
+            <li
+              key={stage.label}
+              className={`rounded-[var(--radius-btn)] p-3 text-center ${stage.tone}`}
             >
-              <span>View School Profile</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span className="block font-display text-step-7 leading-none font-extrabold tabular-nums">
+                {loaded && i === 0 ? saved : 0}
+              </span>
+              <span className="mt-1 block text-step-2 font-semibold">
+                {stage.label}
+              </span>
+            </li>
+          ))}
+        </ol>
+
+        <div className="panel mt-6 flex flex-col items-center gap-4 p-10 text-center">
+          <Kite className="sway w-32" />
+          <h2 className="font-display text-step-6 font-bold text-ink">
+            {saved > 0 ? "Ready when you are" : "No visits booked"}
+          </h2>
+          <p className="max-w-sm text-step-3 leading-relaxed text-ink-soft">
+            {saved > 0
+              ? "Send your questions first. Once a school replies, book a morning when the children are in class."
+              : "Save a few schools and they show up here as you work through them."}
+          </p>
+          <Button asChild variant={saved > 0 ? "default" : "outline"}>
+            <Link href={saved > 0 ? "/compare" : "/shortlist"}>
+              {saved > 0 ? (
+                <>
+                  <CalendarCheck />
+                  See your saved schools
+                </>
+              ) : (
+                <>
+                  Browse schools
+                  <ArrowRight />
+                </>
+              )}
             </Link>
-          </div>
-        </main>
+          </Button>
+        </div>
       </div>
-      <BottomNav />
-    </div>
+    </AppShell>
   );
 }

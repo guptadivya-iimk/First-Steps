@@ -1,55 +1,63 @@
 import React from "react";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, ShieldAlert } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { DoodleDivider, Sprout } from "@/components/doodles";
+
+const STEPS = [
+  {
+    title: "We show our sources",
+    body: "Listing sites carry old fees and curriculum badges a school never claimed. So every fact here is stamped with where it came from, and we say plainly when two sources disagree.",
+  },
+  {
+    title: "We measure the real ride",
+    body: "A circle on a map says nothing about Sohna Road at 9am. We work in minutes by cab, at the hour you would actually be doing drop-off.",
+  },
+  {
+    title: "You do the talking",
+    body: "We draft the questions a school has not answered yet. The message opens in your own WhatsApp or mail app, and goes nowhere until you send it.",
+  },
+];
 
 export default function HowItWorksPage() {
   return (
-    <main className="min-h-screen bg-bg p-4 sm:p-8">
-      <div className="max-w-2xl mx-auto bg-bg-card rounded-card border border-border-light shadow-card p-6 sm:p-8">
+    <main className="paper-grid min-h-dvh px-4 py-8 sm:px-6">
+      <div className="mx-auto w-full max-w-xl">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-text hover:text-teal-primary mb-4"
+          className="inline-flex min-h-touch items-center gap-1.5 text-step-3 font-semibold text-teal-ink hover:underline"
         >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Home</span>
+          <ArrowLeft className="size-4" />
+          Back
         </Link>
 
-        <h1 className="text-2xl font-heading font-bold text-text-main mb-4">
-          How FirstSteps Finder Works
+        <h1 className="mt-3 font-display text-step-9 leading-tight font-extrabold text-ink">
+          How this works
         </h1>
 
-        <div className="space-y-4 text-xs sm:text-sm text-text-muted leading-relaxed">
-          <p>
-            Preschool information in Indian cities is notoriously fragmented and frequently contradictory. Listing platforms often display outdated fee structures, incorrect curriculum badges, and obsolete contact numbers.
-          </p>
+        <ol className="mt-7 flex flex-col gap-5">
+          {STEPS.map((step, i) => (
+            <li key={step.title} className="panel flex gap-4 p-5">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-chip)] bg-teal-pale font-display text-step-4 font-extrabold text-teal-ink">
+                {i + 1}
+              </span>
+              <div>
+                <h2 className="font-display text-step-6 font-bold text-ink">
+                  {step.title}
+                </h2>
+                <p className="mt-1.5 text-step-4 leading-relaxed text-ink-soft">
+                  {step.body}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
 
-          <div className="p-4 bg-bg rounded-xl border border-border-light space-y-2">
-            <h3 className="font-semibold text-text-main text-sm">
-              1. Provenance-Tracked Information
-            </h3>
-            <p>
-              We do not invent data. Every piece of school information is stamped with its source (official school website, verified reply, or listing aggregator) and tagged with a confidence status.
-            </p>
-          </div>
+        <DoodleDivider className="my-7" />
 
-          <div className="p-4 bg-bg rounded-xl border border-border-light space-y-2">
-            <h3 className="font-semibold text-text-main text-sm">
-              2. Real Commute Times with Traffic
-            </h3>
-            <p>
-              Rather than linear radius circles, we compute cab driving times at exact weekday morning drop-off (09:00 AM) and afternoon pickup (01:00 PM) hours using Google Routes API traffic models.
-            </p>
-          </div>
-
-          <div className="p-4 bg-bg rounded-xl border border-border-light space-y-2">
-            <h3 className="font-semibold text-text-main text-sm">
-              3. Strict Human-in-the-Loop Outreach
-            </h3>
-            <p>
-              Our AI engine drafts tailored inquiries highlighting conflicting facts and unverified criteria, but it never contacts schools autonomously. Messages only open on your device after you review and approve every word.
-            </p>
-          </div>
-        </div>
+        <p className="flex items-center justify-center gap-2.5 text-step-3 text-ink-faint">
+          <Sprout className="size-6 shrink-0" />
+          Fourteen schools so far, all within reach of Sector 47.
+        </p>
       </div>
     </main>
   );

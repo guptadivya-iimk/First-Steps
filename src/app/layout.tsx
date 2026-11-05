@@ -1,25 +1,34 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
+/**
+ * Both faces are self-hosted variable fonts, latin subset.
+ * Serving them ourselves keeps the build off Google's rate limiter and saves
+ * parents on a phone a round trip to a third-party domain.
+ */
+const bricolage = localFont({
+  src: "./fonts/bricolage.woff2",
   variable: "--font-bricolage",
-  weight: ["600", "700"],
   display: "swap",
+  weight: "200 800",
+  fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
 });
 
-const dmSans = DM_Sans({
-  subsets: ["latin"],
+const dmSans = localFont({
+  src: "./fonts/dm-sans.woff2",
   variable: "--font-dm-sans",
-  weight: ["400", "500", "600", "700"],
   display: "swap",
+  weight: "100 1000",
+  fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
 });
 
 export const metadata: Metadata = {
-  title: "FirstSteps Finder — Preschool & Daycare Finder (Gurugram)",
+  title: "FirstSteps — preschools near you, checked",
   description:
-    "Montessori, safety, and flexible daycare evaluated with verified provenance. Gurugram, Haryana.",
+    "Fourteen preschools near Sector 47, Gurugram, checked for Montessori training, safety and daycare hours. Every fact shows where it came from.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -29,10 +38,11 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0E5E5A",
+  themeColor: "#FDFBF6",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -41,9 +51,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${bricolage.variable} ${dmSans.variable}`}>
-      <body className="bg-bg text-text-main min-h-screen antialiased flex flex-col">
-        {children}
+    <html
+      lang="en"
+      className={cn(bricolage.variable, dmSans.variable)}
+      suppressHydrationWarning
+    >
+      <body className="min-h-dvh bg-paper text-ink antialiased">
+        <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
       </body>
     </html>
   );
