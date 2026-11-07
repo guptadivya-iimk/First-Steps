@@ -9,11 +9,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
  * Serving them ourselves keeps the build off Google's rate limiter and saves
  * parents on a phone a round trip to a third-party domain.
  */
-const bricolage = localFont({
-  src: "./fonts/bricolage.woff2",
-  variable: "--font-bricolage",
+const outfit = localFont({
+  src: "./fonts/outfit.woff2",
+  variable: "--font-outfit",
   display: "swap",
-  weight: "200 800",
+  weight: "100 900",
   fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
 });
 
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FDFBF6",
+  themeColor: "#F3F2EE",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -53,7 +53,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn(bricolage.variable, dmSans.variable)}
+      className={cn(outfit.variable, dmSans.variable)}
       suppressHydrationWarning
     >
       <body className="min-h-dvh bg-paper text-ink antialiased">

@@ -37,7 +37,7 @@ export function AppShell({
 function Wordmark({ className }: { className?: string }) {
   return (
     <span className={cn("flex min-h-touch items-center gap-2", className)}>
-      <span className="flex size-9 items-center justify-center rounded-[var(--radius-btn)] bg-teal text-white">
+      <span className="flex size-9 items-center justify-center rounded-[var(--radius-btn)] bg-tangerine text-ink">
         <Footprint className="size-5" />
       </span>
       <span className="font-display text-step-6 leading-none font-extrabold tracking-tight">
@@ -69,7 +69,7 @@ function SideRail() {
               className={cn(
                 "flex min-h-touch items-center gap-3 rounded-[var(--radius-btn)] px-3 text-step-4 font-semibold transition-colors",
                 active
-                  ? "bg-teal-pale text-teal-ink"
+                  ? "bg-tangerine-pale text-tangerine-ink"
                   : "text-ink-soft hover:bg-paper-deep hover:text-ink"
               )}
             >
@@ -99,11 +99,11 @@ function TopBar({ areaLabel }: { areaLabel: string }) {
         </Link>
 
         <span className="hidden items-center gap-1.5 text-step-3 font-semibold text-ink-soft lg:flex">
-          <MapPin className="size-4 text-teal" />
+          <MapPin className="size-4 text-tangerine" />
           {areaLabel}
         </span>
 
-        <span className="flex items-center gap-1.5 rounded-[var(--radius-chip)] border border-teal/25 bg-teal-pale px-3 py-1.5 text-step-2 font-semibold text-teal-ink lg:hidden">
+        <span className="flex items-center gap-1.5 rounded-[var(--radius-chip)] border border-tangerine/25 bg-tangerine-pale px-3 py-1.5 text-step-2 font-semibold text-tangerine-ink lg:hidden">
           <MapPin className="size-3.5" />
           Sector 47
         </span>
@@ -137,13 +137,13 @@ function BottomBar() {
               aria-current={active ? "page" : undefined}
               className={cn(
                 "flex min-h-touch flex-1 flex-col items-center justify-center gap-1 rounded-[var(--radius-btn)] py-2 transition-colors",
-                active ? "text-teal-ink" : "text-ink-faint"
+                active ? "text-tangerine-ink" : "text-ink-faint"
               )}
             >
               <span
                 className={cn(
                   "flex h-7 w-11 items-center justify-center rounded-[var(--radius-chip)] transition-colors",
-                  active && "bg-teal-pale"
+                  active && "bg-tangerine-pale"
                 )}
               >
                 <Icon className="size-[18px]" />

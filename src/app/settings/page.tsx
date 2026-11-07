@@ -88,20 +88,20 @@ export default function SettingsPage() {
           </div>
 
           {cleared && (
-            <p className="mt-3 text-step-3 font-semibold text-teal-ink">
+            <p className="mt-3 text-step-3 font-semibold text-tangerine-ink">
               Done. Nothing about you is stored on this device now.
             </p>
           )}
         </section>
 
         <section className="panel mt-4 flex items-start gap-3 p-5">
-          <ShieldCheck className="mt-0.5 size-5 shrink-0 text-teal" />
+          <ShieldCheck className="mt-0.5 size-5 shrink-0 text-tangerine" />
           <p className="text-step-3 leading-relaxed text-ink-soft">
             Your name and your child&apos;s details never leave your device, so
             there is nothing here to identify either of you.{" "}
             <Link
               href="/privacy"
-              className="font-semibold text-teal-ink hover:underline"
+              className="font-semibold text-tangerine-ink hover:underline"
             >
               Read the policy
             </Link>

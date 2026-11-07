@@ -50,13 +50,13 @@ export default function WelcomeConsentPage() {
         </p>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <section className="rounded-[var(--radius-btn)] bg-teal-pale p-4">
-            <h2 className="text-step-3 font-bold text-teal-ink">We keep</h2>
+          <section className="rounded-[var(--radius-btn)] bg-tangerine-pale p-4">
+            <h2 className="text-step-3 font-bold text-tangerine-ink">We keep</h2>
             <ul className="mt-2 flex flex-col gap-1.5">
               {KEPT.map((item) => (
                 <li
                   key={item}
-                  className="flex items-start gap-2 text-step-3 leading-snug text-teal-ink"
+                  className="flex items-start gap-2 text-step-3 leading-snug text-tangerine-ink"
                 >
                   <Check className="mt-0.5 size-3.5 shrink-0" />
                   {item}
@@ -82,12 +82,12 @@ export default function WelcomeConsentPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="mt-6">
-          <label className="flex min-h-touch cursor-pointer items-start gap-3 rounded-[var(--radius-btn)] border border-line-strong p-3.5 text-step-4 leading-relaxed text-ink has-checked:border-teal has-checked:bg-teal-pale">
+          <label className="flex min-h-touch cursor-pointer items-start gap-3 rounded-[var(--radius-btn)] border border-line-strong p-3.5 text-step-4 leading-relaxed text-ink has-checked:border-tangerine has-checked:bg-tangerine-pale">
             <input
               type="checkbox"
               checked={agreed}
               onChange={(e) => setAgreed(e.target.checked)}
-              className="mt-0.5 size-5 shrink-0 accent-[var(--teal)]"
+              className="mt-0.5 size-5 shrink-0 accent-[var(--tangerine)]"
             />
             <span>
               I am the parent or guardian, and I agree to this.
@@ -113,7 +113,7 @@ export default function WelcomeConsentPage() {
 
       <Link
         href="/privacy"
-        className="mt-3 inline-flex min-h-touch items-center text-step-3 font-semibold text-teal-ink hover:underline"
+        className="mt-3 inline-flex min-h-touch items-center text-step-3 font-semibold text-tangerine-ink hover:underline"
       >
         Read the full privacy policy
       </Link>

@@ -51,7 +51,7 @@ export function Blocks({ className, ...props }: DoodleProps) {
         width="36"
         height="34"
         rx="7"
-        className="fill-teal-pale stroke-teal"
+        className="fill-tangerine-pale stroke-lagoon"
         strokeWidth="2.5"
       />
       <rect
@@ -60,7 +60,7 @@ export function Blocks({ className, ...props }: DoodleProps) {
         width="36"
         height="34"
         rx="7"
-        className="fill-marigold-pale stroke-marigold"
+        className="fill-sunshine-pale stroke-sunshine"
         strokeWidth="2.5"
       />
       <rect
@@ -69,14 +69,14 @@ export function Blocks({ className, ...props }: DoodleProps) {
         width="36"
         height="34"
         rx="7"
-        className="fill-sky-pale stroke-sky"
+        className="fill-lagoon-pale stroke-lagoon"
         strokeWidth="2.5"
       />
-      <circle cx="32" cy="69" r="3.2" className="fill-teal" />
-      <circle cx="74" cy="69" r="3.2" className="fill-marigold" />
+      <circle cx="32" cy="69" r="3.2" className="fill-lagoon" />
+      <circle cx="74" cy="69" r="3.2" className="fill-sunshine" />
       <path
         d="M46 33h14"
-        className="stroke-sky"
+        className="stroke-lagoon"
         strokeWidth="2.5"
         strokeLinecap="round"
       />
@@ -96,23 +96,23 @@ export function Kite({ className, ...props }: DoodleProps) {
     >
       <path
         d="M60 10 85 38 60 70 35 38Z"
-        className="fill-marigold-pale stroke-marigold"
+        className="fill-sunshine-pale stroke-sunshine"
         strokeWidth="2.5"
         strokeLinejoin="round"
       />
       <path
         d="M60 10v60M35 38h50"
-        className="stroke-marigold"
+        className="stroke-sunshine"
         strokeWidth="2"
         strokeLinecap="round"
       />
       <path
         d="M60 70c-6 6 6 10 0 16"
-        className="stroke-teal"
+        className="stroke-lagoon"
         strokeWidth="2.5"
         strokeLinecap="round"
       />
-      <circle cx="60" cy="38" r="4" className="fill-marigold" />
+      <circle cx="60" cy="38" r="4" className="fill-sunshine" />
     </svg>
   );
 }
@@ -129,19 +129,19 @@ export function PaperBoat({ className, ...props }: DoodleProps) {
     >
       <path
         d="M22 50h76l-16 24H38Z"
-        className="fill-sky-pale stroke-sky"
+        className="fill-lagoon-pale stroke-lagoon"
         strokeWidth="2.5"
         strokeLinejoin="round"
       />
       <path
         d="M60 46V18l22 28Z"
-        className="fill-teal-pale stroke-teal"
+        className="fill-tangerine-pale stroke-lagoon"
         strokeWidth="2.5"
         strokeLinejoin="round"
       />
       <path
         d="M14 82c6-4 10 4 16 0s10 4 16 0 10 4 16 0 10 4 16 0 10 4 16 0"
-        className="stroke-sky"
+        className="stroke-lagoon"
         strokeWidth="2.5"
         strokeLinecap="round"
       />
@@ -159,10 +159,10 @@ export function Sun({ className, ...props }: DoodleProps) {
       className={cn(base, className)}
       {...props}
     >
-      <circle cx="16" cy="16" r="6.5" className="fill-marigold" />
+      <circle cx="16" cy="16" r="6.5" className="fill-sunshine" />
       <path
         d="M16 3v3.5M16 25.5V29M29 16h-3.5M6.5 16H3M25.2 6.8l-2.5 2.5M9.3 22.7l-2.5 2.5M25.2 25.2l-2.5-2.5M9.3 9.3 6.8 6.8"
-        className="stroke-marigold"
+        className="stroke-sunshine"
         strokeWidth="2.4"
         strokeLinecap="round"
       />
@@ -182,19 +182,19 @@ export function Sprout({ className, ...props }: DoodleProps) {
     >
       <path
         d="M16 28v-11"
-        className="stroke-leaf-ink"
+        className="stroke-forest-ink"
         strokeWidth="2.4"
         strokeLinecap="round"
       />
       <path
         d="M16 18c0-5-4-7-8-7 0 5 3 7 8 7Z"
-        className="fill-leaf-pale stroke-leaf"
+        className="fill-forest-pale stroke-forest"
         strokeWidth="2.2"
         strokeLinejoin="round"
       />
       <path
         d="M16 16c0-5 4-8 8-8 0 5-3 8-8 8Z"
-        className="fill-leaf-pale stroke-leaf"
+        className="fill-forest-pale stroke-forest"
         strokeWidth="2.2"
         strokeLinejoin="round"
       />
@@ -228,7 +228,7 @@ export function DoodleDivider({ className }: { className?: string }) {
       aria-hidden="true"
     >
       <span className="h-px w-16 bg-line-strong sm:w-24" />
-      <Star className="size-3.5 text-marigold" />
+      <Star className="size-3.5 text-sunshine" />
       <span className="h-px w-16 bg-line-strong sm:w-24" />
     </div>
   );
@@ -280,10 +280,10 @@ export function Crayon({ className, ...props }: DoodleProps) {
 export function Rainbow({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 96 52" fill="none" aria-hidden="true" className={cn(base, className)}>
-      <path d="M8 48a40 40 0 0 1 80 0" className="stroke-coral" strokeWidth="7" strokeLinecap="round" />
-      <path d="M17 48a31 31 0 0 1 62 0" className="stroke-marigold" strokeWidth="7" strokeLinecap="round" />
-      <path d="M26 48a22 22 0 0 1 44 0" className="stroke-leaf" strokeWidth="7" strokeLinecap="round" />
-      <path d="M35 48a13 13 0 0 1 26 0" className="stroke-sky" strokeWidth="7" strokeLinecap="round" />
+      <path d="M8 48a40 40 0 0 1 80 0" className="stroke-tangerine" strokeWidth="7" strokeLinecap="round" />
+      <path d="M17 48a31 31 0 0 1 62 0" className="stroke-sunshine" strokeWidth="7" strokeLinecap="round" />
+      <path d="M26 48a22 22 0 0 1 44 0" className="stroke-forest" strokeWidth="7" strokeLinecap="round" />
+      <path d="M35 48a13 13 0 0 1 26 0" className="stroke-lagoon" strokeWidth="7" strokeLinecap="round" />
     </svg>
   );
 }
@@ -371,4 +371,131 @@ export function SchoolMark({
 }) {
   const Component = SCHOOL_MARKS[name] ?? Star;
   return <Component className={className} />;
+}
+
+/* ---------------------------------------------------------------------------
+   Scribbles.
+
+   Loose black pen marks, the kind drawn in a margin while thinking. They sit
+   around headings and in empty corners to keep the page from feeling like a
+   spreadsheet. They carry no meaning, so they are always aria-hidden and they
+   never sit behind text.
+   --------------------------------------------------------------------------- */
+
+const scribble = "pointer-events-none select-none";
+
+/** A loose wave, for under or beside a heading. */
+export function Squiggle({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 120 20"
+      fill="none"
+      aria-hidden="true"
+      className={cn(scribble, className)}
+    >
+      <path
+        d="M3 13c7-10 14 6 21-2s14 8 21 0 14 7 21-1 14 5 21-3 14 6 21-1"
+        stroke="currentColor"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
+/** A spiky burst, for marking something new or good. */
+export function Burst({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 48 48"
+      fill="none"
+      aria-hidden="true"
+      className={cn(scribble, className)}
+    >
+      <path
+        d="m24 3 4.3 9.8 9.4-5-4 9.7 10.4 1.2-8.4 5.4 8.4 5.4-10.4 1.2 4 9.7-9.4-5L24 45l-4.3-9.6-9.4 5 4-9.7L3.9 29.5l8.4-5.4-8.4-5.4 10.4-1.2-4-9.7 9.4 5Z"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
+/** A curl, for a corner that feels empty. */
+export function Curl({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 48 48"
+      fill="none"
+      aria-hidden="true"
+      className={cn(scribble, className)}
+    >
+      <path
+        d="M6 40c0-16 8-26 18-26 7 0 11 5 11 10s-4 9-9 9-8-3-8-7 3-7 7-7c9 0 13 8 13 16"
+        stroke="currentColor"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
+/** Three short speed lines, for motion or emphasis. */
+export function Zips({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 40 28"
+      fill="none"
+      aria-hidden="true"
+      className={cn(scribble, className)}
+    >
+      <path
+        d="M4 6h22M9 14h24M4 22h17"
+        stroke="currentColor"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/** A hand-drawn circle, for ringing a number. */
+export function RingMark({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 100 60"
+      fill="none"
+      aria-hidden="true"
+      className={cn(scribble, className)}
+    >
+      <path
+        d="M62 7C38 1 10 10 6 27c-4 16 20 28 45 26 22-2 44-13 42-27C91 13 72 6 54 6"
+        stroke="currentColor"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
+/** The soft hill that separates one band of the page from the next. */
+export function HillDivider({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 1440 90"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      className={cn("block w-full", className)}
+    >
+      <path
+        d="M0 90V52c120-28 240-42 360-30s240 50 360 50 240-38 360-50 240-6 360 30v38Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
 }

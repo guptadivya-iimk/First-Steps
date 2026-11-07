@@ -79,22 +79,32 @@ self-hosted set); OpenStreetMap's own tiles are not for production volume.
 ## Design
 
 The visual system lives entirely in `src/app/globals.css`. Colours are OKLCH,
-every font size lands on one of eleven ramp steps, and cards rest on a hairline
-rather than a drop shadow.
+every font size lands on one of eleven ramp steps, and surfaces rest on a
+hairline rather than a shadow.
 
-Colour carries information rather than decoration. Two systems run side by side:
+The look is poster-like: a warm paper ground, flat printed colour, and sharp
+rectangles of colour set behind the words that matter. The display face is
+Outfit at 800; body copy is DM Sans at 17px, because this is read one-handed
+by someone who is tired. Both are self-hosted, so the build needs no network.
 
-- **Provenance colours.** Teal means a school confirmed a fact, sky means its
-  website said so, marigold means check it yourself, lilac means nobody knows.
-- **The crayon box.** Six colours, one of which is assigned to each school by
-  its id in `src/lib/schoolIdentity.ts`. A school keeps its colour and its
-  hand-drawn mark everywhere: the card, the comparison table, its map pin. That
-  is what lets a parent follow one school across the product by sight.
+Colour carries information rather than decoration. Two systems run side by
+side:
+
+- **Provenance colours.** Forest means a school confirmed a fact, lagoon means
+  its website said so, sunshine means check it yourself, grape means nobody
+  knows yet.
+- **The crayon box.** Six colours, one assigned to each school by its id in
+  `src/lib/schoolIdentity.ts`. A school keeps its colour and its hand-drawn
+  mark everywhere: the band on its card, the comparison table, its map pin.
+  That is what lets a parent follow one school across the product by sight.
+
+Every solid colour carries a `--crayon-on` token naming the text colour that
+clears WCAG AA on it, because white fails on the brighter half of the palette.
 
 Layout is mobile first. Phones and tablets get a bottom bar under the thumb,
 laptops get a rail on the left. Every interactive target is at least 44px.
 
-Run the design checks against a running dev server:
+Run the design checks against a running server:
 
 ```bash
 npx impeccable detect http://localhost:3000/shortlist

@@ -6,12 +6,12 @@
  */
 
 export const CRAYONS = [
-  "teal",
-  "coral",
-  "marigold",
-  "sky",
+  "tangerine",
+  "lagoon",
+  "forest",
+  "sunshine",
   "grape",
-  "leaf",
+  "berry",
 ] as const;
 
 export type Crayon = (typeof CRAYONS)[number];
@@ -55,15 +55,15 @@ export function crayonClass(id: string): string {
  * Hex values for anything that cannot read a CSS variable, such as map pins.
  *
  * These are the deep cut of each crayon, not the bright one. A pin carries
- * white score text, and white on the bright marigold is 2:1, which no parent
+ * white score text, and white on a bright sunshine yellow is 2:1, which no parent
  * squinting at a phone in sunlight should have to deal with. Every value here
  * clears 5:1 against white.
  */
 export const CRAYON_HEX: Record<Crayon, string> = {
-  teal: "#0b5e5a",
-  coral: "#b2322e",
-  marigold: "#8a5a12",
-  sky: "#2c6ba8",
-  grape: "#6a3fa8",
-  leaf: "#2f7a45",
+  tangerine: "#b8431f",
+  lagoon: "#1f6276",
+  forest: "#2c6b3f",
+  sunshine: "#7d5712",
+  grape: "#5b3a9e",
+  berry: "#a8294a",
 };

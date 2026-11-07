@@ -120,7 +120,7 @@ export default function SchoolDetailPage({
           </div>
 
           {school.status === "possibly_closed" && (
-            <p className="mt-4 flex items-start gap-2 rounded-[var(--radius-btn)] bg-marigold-pale px-3 py-2.5 text-step-3 text-marigold-ink">
+            <p className="mt-4 flex items-start gap-2 rounded-[var(--radius-btn)] bg-sunshine-pale px-3 py-2.5 text-step-3 text-sunshine-ink">
               <AlertTriangle className="mt-0.5 size-4 shrink-0" />
               This branch may have closed. Call before you plan a visit.
             </p>
@@ -166,7 +166,7 @@ export default function SchoolDetailPage({
               aria-pressed={saved}
             >
               <Heart
-                className={cn(saved && "fill-blossom text-blossom")}
+                className={cn(saved && "fill-berry text-berry")}
               />
               {saved ? "Saved" : "Save"}
             </Button>
@@ -179,15 +179,15 @@ export default function SchoolDetailPage({
 
         {/* ---- Worth asking ---- */}
         {(conflicts.length > 0 || score.openQuestions.length > 0) && (
-          <section className="panel mt-4 border-marigold/30 bg-marigold-pale p-5">
-            <h2 className="font-display text-step-6 font-bold text-marigold-ink">
+          <section className="panel mt-4 border-sunshine/30 bg-sunshine-pale p-5">
+            <h2 className="font-display text-step-6 font-bold text-sunshine-ink">
               Worth asking about
             </h2>
             <ul className="mt-3 flex flex-col gap-2">
               {score.openQuestions.map((q) => (
                 <li
                   key={q}
-                  className="flex items-start gap-2 text-step-3 leading-relaxed text-marigold-ink"
+                  className="flex items-start gap-2 text-step-3 leading-relaxed text-sunshine-ink"
                 >
                   <AlertTriangle className="mt-0.5 size-4 shrink-0" />
                   {q}
@@ -265,7 +265,7 @@ export default function SchoolDetailPage({
                               href={source.url}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex items-center gap-1 font-semibold text-teal-ink hover:underline"
+                              className="inline-flex items-center gap-1 font-semibold text-tangerine-ink hover:underline"
                             >
                               Open
                               <ExternalLink className="size-3" />
@@ -299,7 +299,7 @@ export default function SchoolDetailPage({
               href={school.website}
               target="_blank"
               rel="noreferrer"
-              className="mt-1 inline-flex min-h-touch items-center gap-1.5 text-step-3 font-semibold text-teal-ink hover:underline"
+              className="mt-1 inline-flex min-h-touch items-center gap-1.5 text-step-3 font-semibold text-tangerine-ink hover:underline"
             >
               School website
               <ExternalLink className="size-3.5" />

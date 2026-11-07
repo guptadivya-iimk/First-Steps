@@ -36,7 +36,7 @@ export default function PrivacyPage() {
       <div className="mx-auto w-full max-w-xl">
         <Link
           href="/"
-          className="inline-flex min-h-touch items-center gap-1.5 text-step-3 font-semibold text-teal-ink hover:underline"
+          className="inline-flex min-h-touch items-center gap-1.5 text-step-3 font-semibold text-tangerine-ink hover:underline"
         >
           <ArrowLeft className="size-4" />
           Back
@@ -53,7 +53,7 @@ export default function PrivacyPage() {
 
         <div className="mt-7 grid gap-4 sm:grid-cols-2">
           <section className="panel p-5">
-            <h2 className="font-display text-step-5 font-bold text-teal-ink">
+            <h2 className="font-display text-step-5 font-bold text-tangerine-ink">
               What we keep
             </h2>
             <ul className="mt-3 flex flex-col gap-2">
@@ -62,7 +62,7 @@ export default function PrivacyPage() {
                   key={item}
                   className="flex items-start gap-2 text-step-3 leading-relaxed text-ink-soft"
                 >
-                  <Check className="mt-0.5 size-4 shrink-0 text-teal" />
+                  <Check className="mt-0.5 size-4 shrink-0 text-tangerine" />
                   {item}
                 </li>
               ))}

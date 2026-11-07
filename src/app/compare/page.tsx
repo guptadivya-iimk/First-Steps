@@ -111,7 +111,7 @@ export default function ComparePage() {
                       </span>
                       <Link
                         href={`/school/${school.id}`}
-                        className="mt-2 block font-display text-step-4 leading-snug font-bold text-ink hover:text-teal-ink"
+                        className="mt-2 block font-display text-step-4 leading-snug font-bold text-ink hover:text-tangerine-ink"
                       >
                         {school.name}
                       </Link>
@@ -142,7 +142,7 @@ export default function ComparePage() {
                             <span className="flex flex-col items-start gap-1.5">
                               <span className="flex items-start gap-1.5 text-step-3 leading-snug text-ink">
                                 {fact.value === true && (
-                                  <Check className="mt-0.5 size-4 shrink-0 text-leaf-ink" />
+                                  <Check className="mt-0.5 size-4 shrink-0 text-forest-ink" />
                                 )}
                                 {fact.displayText}
                               </span>

@@ -9,15 +9,15 @@ import { Slot } from "radix-ui"
  * check it yourself. Lilac means nobody knows yet.
  */
 const badgeVariants = cva(
-  "inline-flex w-fit max-w-full items-center gap-1.5 rounded-[var(--radius-chip)] border px-2.5 py-1 text-step-1 leading-snug font-semibold [&>svg]:pointer-events-none [&>svg]:size-3.5",
+  "inline-flex w-fit max-w-full items-center gap-1.5 rounded-[var(--radius-sm)] border px-2 py-1 text-step-1 leading-snug font-semibold [&>svg]:pointer-events-none [&>svg]:size-3.5",
   {
     variants: {
       variant: {
-        default: "border-teal/25 bg-teal-pale text-teal-ink",
-        website: "border-sky/30 bg-sky-pale text-sky-ink",
-        warn: "border-marigold/40 bg-marigold-pale text-marigold-ink",
-        ask: "border-lilac/30 bg-lilac-pale text-lilac-ink",
-        good: "border-leaf/30 bg-leaf-pale text-leaf-ink",
+        default: "border-forest/30 bg-forest-pale text-forest-ink",
+        website: "border-lagoon/35 bg-lagoon-pale text-lagoon-ink",
+        warn: "border-sunshine-ink/25 bg-sunshine-pale text-sunshine-ink",
+        ask: "border-grape/25 bg-grape-pale text-grape-ink",
+        good: "border-lime-ink/25 bg-lime-pale text-lime-ink",
         soft: "border-line bg-paper-deep text-ink-soft",
         outline: "border-line-strong bg-transparent text-ink-soft",
       },

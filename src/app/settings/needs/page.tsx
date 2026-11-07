@@ -35,13 +35,13 @@ const WEIGHT_ROWS: {
     key: "montessori",
     label: "Montessori",
     hint: "Trained teachers and a real prepared classroom",
-    crayon: "crayon crayon-teal",
+    crayon: "crayon crayon-lagoon",
   },
   {
     key: "safety",
     label: "Safety",
     hint: "CCTV you can watch, women-only toileting staff",
-    crayon: "crayon crayon-coral",
+    crayon: "crayon crayon-tangerine",
   },
   {
     key: "daycare",
@@ -53,13 +53,13 @@ const WEIGHT_ROWS: {
     key: "travel",
     label: "Travel",
     hint: "Minutes in the cab each morning",
-    crayon: "crayon crayon-sky",
+    crayon: "crayon crayon-berry",
   },
   {
     key: "fees",
     label: "Fees",
     hint: "What it costs each month",
-    crayon: "crayon crayon-marigold",
+    crayon: "crayon crayon-sunshine",
   },
 ];
 
@@ -120,8 +120,8 @@ export default function MyNeedsPage() {
               className={cn(
                 "inline-flex items-center gap-1.5 rounded-[var(--radius-chip)] px-2.5 py-1 text-step-2 font-bold tabular-nums",
                 balanced
-                  ? "bg-leaf-pale text-leaf-ink"
-                  : "bg-marigold-pale text-marigold-ink"
+                  ? "bg-forest-pale text-forest-ink"
+                  : "bg-sunshine-pale text-sunshine-ink"
               )}
             >
               {balanced && <Check className="size-3.5" />}
@@ -227,7 +227,7 @@ export default function MyNeedsPage() {
             >
               Longest ride you would accept
             </label>
-            <span className="text-step-3 font-semibold tabular-nums text-teal-ink">
+            <span className="text-step-3 font-semibold tabular-nums text-tangerine-ink">
               {prefs.maxTravelMinutes} min
             </span>
           </div>
@@ -264,7 +264,7 @@ export default function MyNeedsPage() {
                   aria-pressed={on}
                   className={`min-h-touch rounded-[var(--radius-chip)] border px-4 text-step-3 font-semibold transition-colors ${
                     on
-                      ? "border-teal bg-teal-pale text-teal-ink"
+                      ? "border-tangerine bg-tangerine-pale text-tangerine-ink"
                       : "border-line-strong bg-paper-raised text-ink-faint"
                   }`}
                 >

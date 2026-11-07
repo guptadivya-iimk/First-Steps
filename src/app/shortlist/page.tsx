@@ -192,7 +192,7 @@ export default function ShortlistPage() {
                 className={cn(
                   "inline-flex min-h-touch items-center gap-2 rounded-[var(--radius-chip)] px-4 text-step-3 font-bold transition-colors",
                   view === key
-                    ? "bg-paper-raised text-teal-ink shadow-[var(--shadow-rest)]"
+                    ? "bg-paper-raised text-tangerine-ink shadow-[var(--shadow-rest)]"
                     : "text-ink-faint hover:text-ink"
                 )}
               >
@@ -275,7 +275,7 @@ export default function ShortlistPage() {
                   <h2 className="text-step-4 leading-snug font-bold text-ink">
                     <Link
                       href={`/school/${pinnedEntry.school.id}`}
-                      className="hover:text-teal-ink"
+                      className="hover:text-tangerine-ink"
                     >
                       {pinnedEntry.school.name}
                     </Link>
@@ -365,7 +365,7 @@ export default function ShortlistPage() {
                     >
                       <Link
                         href={`/school/${entry.school.id}`}
-                        className="text-step-3 font-semibold text-ink hover:text-teal-ink"
+                        className="text-step-3 font-semibold text-ink hover:text-tangerine-ink"
                       >
                         {entry.school.name}
                       </Link>

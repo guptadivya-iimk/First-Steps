@@ -3,9 +3,10 @@ import { test, expect } from "@playwright/test";
 test.describe("Core flows", () => {
   test("landing page shows the pitch and both ways in", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText(
-      "A first school you can feel good about."
-    );
+    // The headline is set as two colour blocks, so it is two spans.
+    const headline = page.getByRole("heading", { level: 1 });
+    await expect(headline).toContainText("A first school");
+    await expect(headline).toContainText("you can trust");
     await expect(page.getByText("Real cab times")).toBeVisible();
     await expect(page.getByText("Montessori, checked")).toBeVisible();
     await expect(

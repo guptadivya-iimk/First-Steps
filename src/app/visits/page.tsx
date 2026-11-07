@@ -10,11 +10,11 @@ import { Kite } from "@/components/doodles";
 
 const STAGES = [
   { label: "To ask", tone: "bg-paper-deep text-ink-soft" },
-  { label: "Asked", tone: "bg-sky-pale text-sky-ink" },
-  { label: "Replied", tone: "bg-teal-pale text-teal-ink" },
-  { label: "Visiting", tone: "bg-marigold-pale text-marigold-ink" },
-  { label: "Visited", tone: "bg-lilac-pale text-lilac-ink" },
-  { label: "Decided", tone: "bg-leaf-pale text-leaf-ink" },
+  { label: "Asked", tone: "bg-lagoon-pale text-lagoon-ink" },
+  { label: "Replied", tone: "bg-tangerine-pale text-tangerine-ink" },
+  { label: "Visiting", tone: "bg-sunshine-pale text-sunshine-ink" },
+  { label: "Visited", tone: "bg-grape-pale text-grape-ink" },
+  { label: "Decided", tone: "bg-forest-pale text-forest-ink" },
 ];
 
 export default function VisitsPage() {

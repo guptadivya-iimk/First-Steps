@@ -12,15 +12,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-teal text-white hover:bg-teal-deep",
-        warm: "bg-marigold text-marigold-ink hover:brightness-[0.97]",
+        default: "bg-tangerine text-ink hover:brightness-95",
+        warm: "bg-sunshine text-ink hover:brightness-95",
         outline:
-          "border-line-strong bg-paper-raised text-ink hover:bg-paper-deep",
-        secondary: "bg-teal-pale text-teal-ink hover:bg-teal-pale/70",
+          "border-ink/20 bg-paper-raised text-ink hover:bg-paper-deep",
+        secondary: "bg-sand text-ink hover:brightness-[0.97]",
         ghost: "text-ink-soft hover:bg-paper-deep hover:text-ink",
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20",
-        link: "text-teal-ink underline underline-offset-4 hover:text-teal",
+        link: "text-tangerine-ink underline underline-offset-4 hover:text-tangerine",
       },
       size: {
         default: "min-h-touch px-5 text-step-4",

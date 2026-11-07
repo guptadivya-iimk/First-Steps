@@ -24,7 +24,7 @@ export default function HowItWorksPage() {
       <div className="mx-auto w-full max-w-xl">
         <Link
           href="/"
-          className="inline-flex min-h-touch items-center gap-1.5 text-step-3 font-semibold text-teal-ink hover:underline"
+          className="inline-flex min-h-touch items-center gap-1.5 text-step-3 font-semibold text-tangerine-ink hover:underline"
         >
           <ArrowLeft className="size-4" />
           Back
@@ -37,7 +37,7 @@ export default function HowItWorksPage() {
         <ol className="mt-7 flex flex-col gap-5">
           {STEPS.map((step, i) => (
             <li key={step.title} className="panel flex gap-4 p-5">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-chip)] bg-teal-pale font-display text-step-4 font-extrabold text-teal-ink">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-chip)] bg-tangerine-pale font-display text-step-4 font-extrabold text-tangerine-ink">
                 {i + 1}
               </span>
               <div>

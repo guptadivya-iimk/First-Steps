@@ -1,20 +1,27 @@
 import React from "react";
 import Link from "next/link";
 import { Car, ShieldCheck, Send, ArrowRight, Map as MapIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Footprint, Sun, Rainbow } from "@/components/doodles";
+import { cn } from "@/lib/utils";
+import {
+  Footprint,
+  Squiggle,
+  Burst,
+  Curl,
+  HillDivider,
+  Rainbow,
+} from "@/components/doodles";
 
 const PROMISES = [
   {
     Icon: MapIcon,
-    crayon: "crayon crayon-coral",
+    crayon: "crayon crayon-tangerine",
     title: "An atlas, not a list",
     body: "Every preschool pinned, with its fit score on the pin.",
   },
   {
     Icon: Car,
-    crayon: "crayon crayon-marigold",
+    crayon: "crayon crayon-sunshine",
     title: "Real cab times",
     body: "Minutes at 9am traffic, not distance on a map.",
   },
@@ -26,7 +33,7 @@ const PROMISES = [
   },
   {
     Icon: Send,
-    crayon: "crayon crayon-sky",
+    crayon: "crayon crayon-lagoon",
     title: "Questions, drafted",
     body: "We write the message. You decide whether to send it.",
   },
@@ -34,42 +41,45 @@ const PROMISES = [
 
 export default function LandingPage() {
   return (
-    <main className="paper-grid min-h-dvh">
-      <div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col px-4 sm:px-6">
-        <header className="flex min-h-touch items-center justify-between py-5">
-          <span className="flex items-center gap-2">
-            <span className="flex size-9 items-center justify-center rounded-[var(--radius-btn)] bg-teal text-white">
-              <Footprint className="size-5" />
-            </span>
-            <span className="font-display text-step-6 leading-none font-extrabold tracking-tight">
-              FirstSteps
-            </span>
+    <main className="min-h-dvh bg-paper">
+      {/* ---------- Top bar ---------- */}
+      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
+        <span className="flex min-h-touch items-center gap-2">
+          <span className="flex size-9 items-center justify-center rounded-[var(--radius-btn)] bg-tangerine text-ink">
+            <Footprint className="size-5" />
           </span>
-          <span className="rounded-[var(--radius-chip)] border border-teal/25 bg-teal-pale px-3 py-1.5 text-step-2 font-semibold text-teal-ink">
-            Gurugram
+          <span className="font-display text-step-6 leading-none font-extrabold tracking-tight">
+            FirstSteps
           </span>
-        </header>
+        </span>
+        <span className="rounded-[var(--radius-chip)] border border-ink/15 bg-sand px-3 py-1.5 text-step-2 font-bold text-ink">
+          Gurugram
+        </span>
+      </header>
 
-        <div className="flex flex-1 flex-col justify-center gap-10 py-8 lg:flex-row lg:items-center lg:gap-16 lg:py-16">
-          {/* ---- The pitch ---- */}
-          <div className="flex-1">
-            <p className="mb-4 inline-flex items-center gap-2 rounded-[var(--radius-chip)] border border-coral/30 bg-coral-pale px-3 py-1.5 text-step-2 font-bold text-coral-ink">
-              14 preschools, all checked
-            </p>
+      {/* ---------- Hero ---------- */}
+      <section className="paper-grid relative overflow-hidden">
+        <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 pt-6 pb-24 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-14 lg:pt-10 lg:pb-32">
+          <div className="relative">
+            <Curl className="absolute -top-6 right-4 hidden size-12 text-ink/25 lg:block" />
 
-            <h1 className="font-display text-step-9 leading-[1.08] font-extrabold text-ink sm:text-step-10 lg:text-step-11">
-              A first school you can{" "}
-              <span className="crayon-underline">feel good</span> about.
+            {/* The block headline: flat colour, sharp corners, staggered. */}
+            <h1 className="block-line text-step-10 sm:text-step-11">
+              <span className="block-word block-word--a">A first school</span>
+              <span className="block-word block-word--b">you can trust</span>
             </h1>
 
-            <p className="mt-5 max-w-md text-step-5 leading-relaxed text-ink-soft">
-              Fourteen preschools near Sector 47, checked for Montessori
-              training, safety and daycare hours. Every fact shows where it came
-              from.
-            </p>
+            <div className="mt-7 flex items-start gap-3">
+              <Squiggle className="mt-1 hidden h-4 w-16 shrink-0 text-ink/35 sm:block" />
+              <p className="max-w-md text-step-5 leading-relaxed text-ink-soft">
+                Fourteen preschools near Sector 47, checked for Montessori
+                training, safety and daycare hours. Every fact shows where it
+                came from.
+              </p>
+            </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button asChild size="lg" className="sm:w-auto">
+              <Button asChild size="lg">
                 <Link href="/welcome">
                   Continue with Google
                   <ArrowRight />
@@ -85,14 +95,18 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* ---- What you get ---- */}
-          <div className="panel relative flex-1 p-5 sm:p-7">
-            <Sun className="sway absolute -top-4 -right-3 size-10" />
+          {/* ---------- What you get ---------- */}
+          <div className="relative">
+            <Burst className="absolute -top-5 -left-4 hidden size-11 text-ink/25 lg:block" />
 
-            <ul className="flex flex-col gap-5">
-              {PROMISES.map(({ Icon, title, body, crayon }) => (
-                <li key={title} className={cn(crayon, "flex items-start gap-3.5")}>
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-btn)] bg-[var(--crayon-pale)] text-[var(--crayon-ink)]">
+            <ul className="flex flex-col gap-2.5">
+              {PROMISES.map(({ Icon, title, body, crayon }, i) => (
+                <li
+                  key={title}
+                  data-on={i === 0}
+                  className={cn(crayon, "row-flat flex items-start gap-3.5 p-4")}
+                >
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--crayon)] text-[var(--crayon-on)]">
                     <Icon className="size-5" />
                   </span>
                   <div>
@@ -107,8 +121,8 @@ export default function LandingPage() {
               ))}
             </ul>
 
-            <div className="mt-6 flex items-center gap-3 border-t border-line pt-5">
-              <Rainbow className="h-8 w-14 shrink-0" />
+            <div className="mt-5 flex items-center gap-3 px-1">
+              <Rainbow className="h-7 w-12 shrink-0" />
               <p className="text-step-3 text-ink-soft">
                 Made for families starting out in Sector 47.
               </p>
@@ -116,16 +130,27 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <footer className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line py-5 text-step-2 text-ink-faint">
-          <Link href="/how-it-works" className="inline-flex min-h-touch items-center hover:text-teal-ink">
+        <HillDivider className="absolute inset-x-0 bottom-0 h-14 text-paper-raised sm:h-20" />
+      </section>
+
+      {/* ---------- Footer ---------- */}
+      <footer className="bg-paper-raised">
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-8 text-step-2 text-ink-faint sm:px-6">
+          <Link
+            href="/how-it-works"
+            className="inline-flex min-h-touch items-center font-semibold hover:text-tangerine-ink"
+          >
             How it works
           </Link>
-          <Link href="/privacy" className="inline-flex min-h-touch items-center hover:text-teal-ink">
+          <Link
+            href="/privacy"
+            className="inline-flex min-h-touch items-center font-semibold hover:text-tangerine-ink"
+          >
             Privacy
           </Link>
           <span className="ml-auto">Sector 47, Gurugram</span>
-        </footer>
-      </div>
+        </div>
+      </footer>
     </main>
   );
 }
