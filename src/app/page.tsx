@@ -11,7 +11,8 @@ import {
   HillDivider,
   Rainbow,
 } from "@/components/doodles";
-import { ScooterKid, LittleBird } from "@/components/doodles/Characters";
+import { LittleBird } from "@/components/doodles/Characters";
+import { BlockBuilder } from "@/components/doodles/BlockBuilder";
 
 const PROMISES = [
   {
@@ -103,7 +104,7 @@ export default function LandingPage() {
 
             {/* The character rides under the headline on a phone, and moves
                 beside it once there is room. */}
-            <ScooterKid className="anim-pop anim-d3 mt-8 w-full max-w-[17rem] sm:max-w-[20rem] xl:hidden" />
+            <BlockBuilder className="anim-pop anim-d3 mt-8 w-full max-w-[19rem] sm:max-w-[23rem] xl:hidden" />
           </div>
 
           {/* ---------- What you get ---------- */}
@@ -148,7 +149,7 @@ export default function LandingPage() {
 
         {/* On a wide screen the character rides in the gap between the two
             columns, along the hill. */}
-        <ScooterKid className="anim-pop anim-d3 pointer-events-none absolute bottom-3 left-[44%] hidden w-56 -translate-x-1/2 xl:block" />
+        <BlockBuilder className="anim-pop anim-d3 pointer-events-none absolute bottom-2 left-[44%] hidden w-72 -translate-x-1/2 xl:block" />
 
         <HillDivider className="absolute inset-x-0 bottom-0 h-14 text-paper-raised sm:h-20" />
       </section>

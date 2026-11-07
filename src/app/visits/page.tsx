@@ -6,7 +6,7 @@ import { CalendarCheck, ArrowRight } from "lucide-react";
 import { AppShell } from "@/components/navigation/AppShell";
 import { Button } from "@/components/ui/button";
 import { usePreferences } from "@/lib/usePreferences";
-import { Kite } from "@/components/doodles";
+import { ScooterKid } from "@/components/doodles/Characters";
 
 const STAGES = [
   { label: "To ask", tone: "bg-paper-deep text-ink-soft" },
@@ -48,7 +48,7 @@ export default function VisitsPage() {
         </ol>
 
         <div className="panel mt-6 flex flex-col items-center gap-4 p-10 text-center">
-          <Kite className="sway w-32" />
+          <ScooterKid className="w-52" />
           <h2 className="font-display text-step-6 font-bold text-ink">
             {saved > 0 ? "Ready when you are" : "No visits booked"}
           </h2>
