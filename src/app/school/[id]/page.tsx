@@ -30,7 +30,8 @@ import {
 import { usePreferences } from "@/lib/usePreferences";
 import { estimateCabMinutes, scoreSchool } from "@/lib/scoring";
 import { cn } from "@/lib/utils";
-import { Sun, SchoolMark } from "@/components/doodles";
+import { SchoolMark } from "@/components/doodles";
+import { SunnyFace } from "@/components/doodles/Characters";
 import { crayonClass, doodleFor } from "@/lib/schoolIdentity";
 
 const SchoolMap = dynamic(
@@ -94,7 +95,7 @@ export default function SchoolDetailPage({
           )}
         >
           {score.total >= 85 && (
-            <Sun className="absolute -top-3 -right-3 size-14 opacity-70" />
+            <SunnyFace className="absolute -top-3 -right-3 size-16" />
           )}
 
           <div className="flex items-start justify-between gap-4">

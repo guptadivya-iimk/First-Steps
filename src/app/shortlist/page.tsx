@@ -326,9 +326,10 @@ export default function ShortlistPage() {
             </div>
           ) : (
             <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {matching.map(({ school, score, cabMinutes, feeLabel }) => (
+              {matching.map(({ school, score, cabMinutes, feeLabel }, i) => (
                 <SchoolCard
                   key={school.id}
+                  index={i}
                   school={school}
                   score={score}
                   cabMinutes={cabMinutes}

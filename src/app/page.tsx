@@ -11,6 +11,7 @@ import {
   HillDivider,
   Rainbow,
 } from "@/components/doodles";
+import { ScooterKid, LittleBird } from "@/components/doodles/Characters";
 
 const PROMISES = [
   {
@@ -39,12 +40,14 @@ const PROMISES = [
   },
 ];
 
+const PROMISE_DELAY = ["anim-d2", "anim-d3", "anim-d4", "anim-d5"];
+
 export default function LandingPage() {
   return (
     <main className="min-h-dvh bg-paper">
       {/* ---------- Top bar ---------- */}
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
-        <span className="flex min-h-touch items-center gap-2">
+        <span className="anim-rise flex min-h-touch items-center gap-2">
           <span className="flex size-9 items-center justify-center rounded-[var(--radius-btn)] bg-tangerine text-ink">
             <Footprint className="size-5" />
           </span>
@@ -52,24 +55,28 @@ export default function LandingPage() {
             FirstSteps
           </span>
         </span>
-        <span className="rounded-[var(--radius-chip)] border border-ink/15 bg-sand px-3 py-1.5 text-step-2 font-bold text-ink">
+        <span className="anim-rise anim-d1 rounded-[var(--radius-chip)] border border-ink/15 bg-sand px-3 py-1.5 text-step-2 font-bold text-ink">
           Gurugram
         </span>
       </header>
 
       {/* ---------- Hero ---------- */}
       <section className="paper-grid relative overflow-hidden">
-        <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 pt-6 pb-24 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-14 lg:pt-10 lg:pb-32">
+        <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 pt-4 pb-28 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-12 lg:pt-8 lg:pb-36 xl:pb-52">
           <div className="relative">
-            <Curl className="absolute -top-6 right-4 hidden size-12 text-ink/25 lg:block" />
+            <Curl className="absolute -top-8 right-6 hidden size-12 text-ink/20 lg:block" />
 
-            {/* The block headline: flat colour, sharp corners, staggered. */}
+            {/* The block headline, arriving one word at a time. */}
             <h1 className="block-line text-step-10 sm:text-step-11">
-              <span className="block-word block-word--a">A first school</span>
-              <span className="block-word block-word--b">you can trust</span>
+              <span className="anim-block block-word block-word--a">
+                A first school
+              </span>
+              <span className="anim-block anim-d2 block-word block-word--b">
+                you can trust
+              </span>
             </h1>
 
-            <div className="mt-7 flex items-start gap-3">
+            <div className="anim-rise anim-d4 mt-7 flex items-start gap-3">
               <Squiggle className="mt-1 hidden h-4 w-16 shrink-0 text-ink/35 sm:block" />
               <p className="max-w-md text-step-5 leading-relaxed text-ink-soft">
                 Fourteen preschools near Sector 47, checked for Montessori
@@ -78,7 +85,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="anim-rise anim-d5 mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg">
                 <Link href="/welcome">
                   Continue with Google
@@ -90,21 +97,30 @@ export default function LandingPage() {
               </Button>
             </div>
 
-            <p className="mt-4 text-step-2 text-ink-faint">
+            <p className="anim-rise anim-d6 mt-4 text-step-2 text-ink-faint">
               Free while we are testing in Sector 47.
             </p>
+
+            {/* The character rides under the headline on a phone, and moves
+                beside it once there is room. */}
+            <ScooterKid className="anim-pop anim-d3 mt-8 w-full max-w-[17rem] sm:max-w-[20rem] xl:hidden" />
           </div>
 
           {/* ---------- What you get ---------- */}
           <div className="relative">
-            <Burst className="absolute -top-5 -left-4 hidden size-11 text-ink/25 lg:block" />
+            <Burst className="absolute -top-6 -left-5 hidden size-11 text-ink/20 lg:block" />
+            <LittleBird className="absolute -top-9 right-2 hidden w-12 lg:block" />
 
             <ul className="flex flex-col gap-2.5">
               {PROMISES.map(({ Icon, title, body, crayon }, i) => (
                 <li
                   key={title}
                   data-on={i === 0}
-                  className={cn(crayon, "row-flat flex items-start gap-3.5 p-4")}
+                  className={cn(
+                    crayon,
+                    "anim-rise row-flat hover-lift flex items-start gap-3.5 p-4",
+                    PROMISE_DELAY[i]
+                  )}
                 >
                   <span className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--crayon)] text-[var(--crayon-on)]">
                     <Icon className="size-5" />
@@ -121,7 +137,7 @@ export default function LandingPage() {
               ))}
             </ul>
 
-            <div className="mt-5 flex items-center gap-3 px-1">
+            <div className="anim-rise anim-d6 mt-5 flex items-center gap-3 px-1">
               <Rainbow className="h-7 w-12 shrink-0" />
               <p className="text-step-3 text-ink-soft">
                 Made for families starting out in Sector 47.
@@ -129,6 +145,10 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
+
+        {/* On a wide screen the character rides in the gap between the two
+            columns, along the hill. */}
+        <ScooterKid className="anim-pop anim-d3 pointer-events-none absolute bottom-3 left-[44%] hidden w-56 -translate-x-1/2 xl:block" />
 
         <HillDivider className="absolute inset-x-0 bottom-0 h-14 text-paper-raised sm:h-20" />
       </section>

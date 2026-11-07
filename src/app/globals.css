@@ -464,6 +464,182 @@
   font-weight: 600 !important;
 }
 
+/* ---------------------------------------------------------------------------
+   Motion.
+
+   Two kinds only. Characters idle forever, slowly, so the page feels alive
+   without asking for attention. Everything else plays once on arrival and
+   then stops. Nothing loops fast, nothing bounces, nothing moves while a
+   parent is trying to read. The reduced-motion block at the end switches the
+   whole lot off.
+   --------------------------------------------------------------------------- */
+
+/* ---- Characters, idling ---- */
+
+.character {
+  overflow: visible;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+@keyframes roll {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes waving {
+  0%, 62%, 100% { transform: rotate(0deg); }
+  70% { transform: rotate(-20deg); }
+  78% { transform: rotate(6deg); }
+  86% { transform: rotate(-16deg); }
+}
+
+@keyframes nod {
+  0%, 100% { transform: rotate(-1.6deg); }
+  50% { transform: rotate(1.6deg); }
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) rotate(-3deg); }
+  50% { transform: translate(5px, -11px) rotate(3deg); }
+}
+
+@keyframes flap {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.45); }
+}
+
+@keyframes zip {
+  0%, 100% { opacity: 0.15; transform: translateX(0); }
+  50% { opacity: 0.6; transform: translateX(-9px); }
+}
+
+.character__body {
+  animation: bob 3.4s ease-in-out infinite;
+}
+
+.character__scooter {
+  animation: bob 3.4s ease-in-out infinite;
+}
+
+/* The wheels have to spin about their own centres, so each is given one. */
+.character__wheel {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: roll 2.6s linear infinite;
+}
+
+.character__wheel--b {
+  animation-duration: 2.6s;
+}
+
+.character__wave {
+  transform-box: fill-box;
+  transform-origin: 92% 86%;
+  animation: waving 4.2s ease-in-out infinite;
+}
+
+.character__head {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: nod 3.4s ease-in-out infinite;
+}
+
+.character__balloon {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: drift 6s ease-in-out infinite;
+}
+
+.character__zips > path {
+  animation: zip 2.2s ease-in-out infinite;
+}
+
+.character__zips > path:last-child {
+  animation-delay: 0.4s;
+}
+
+.character__hover {
+  animation: bob 2.8s ease-in-out infinite;
+}
+
+.character__wing {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: flap 0.9s ease-in-out infinite;
+}
+
+.character__spin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: roll 24s linear infinite;
+}
+
+/* ---- Arrival, played once ---- */
+
+@keyframes block-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) rotate(-1.4deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.82); }
+  70% { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.anim-block {
+  animation: block-in 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.anim-rise {
+  animation: rise-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.anim-pop {
+  animation: pop-in 460ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Small, hand-set delays so a group arrives as a group, not a volley. */
+.anim-d1 { animation-delay: 90ms; }
+.anim-d2 { animation-delay: 180ms; }
+.anim-d3 { animation-delay: 270ms; }
+.anim-d4 { animation-delay: 360ms; }
+.anim-d5 { animation-delay: 450ms; }
+.anim-d6 { animation-delay: 540ms; }
+
+/* A card lifts a little under the cursor. Nothing on touch, which has none. */
+@media (hover: hover) {
+  .hover-lift {
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-3px);
+  }
+}
+
 /* A single gentle motion, for playful marks only. */
 @keyframes sway {
   0%,
@@ -486,6 +662,10 @@
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    /* Delays are zeroed too. Without this the entrance animations still wait
+       their turn, so a reduced-motion reader watches half a second of blank
+       page before the words appear. */
+    animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }

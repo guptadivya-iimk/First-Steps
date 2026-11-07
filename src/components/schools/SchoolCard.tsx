@@ -20,6 +20,7 @@ export function SchoolCard({
   saved,
   onToggleSave,
   onShowOnMap,
+  index = 0,
 }: {
   school: School;
   score: ScoreResult;
@@ -28,6 +29,8 @@ export function SchoolCard({
   saved: boolean;
   onToggleSave: () => void;
   onShowOnMap?: () => void;
+  /** Position in the list, used only to stagger the arrival. */
+  index?: number;
 }) {
   const curriculum = school.facts.curriculum;
   const cctv = school.facts.cctvParentAccess?.value === true;
@@ -40,7 +43,11 @@ export function SchoolCard({
     <article
       className={cn(
         crayonClass(school.id),
-        "panel-crayon flex flex-col overflow-hidden transition-shadow hover:shadow-[var(--shadow-lift)]"
+        "panel-crayon anim-rise hover-lift flex flex-col overflow-hidden hover:shadow-[var(--shadow-lift)]",
+        // Only the first few stagger. Past that it is just a wait.
+        ["", "anim-d1", "anim-d2", "anim-d3", "anim-d4", "anim-d5"][
+          Math.min(index, 5)
+        ]
       )}
     >
       {/* A flat band of the school's own colour, carrying its mark. */}
