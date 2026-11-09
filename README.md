@@ -101,6 +101,25 @@ side:
 Every solid colour carries a `--crayon-on` token naming the text colour that
 clears WCAG AA on it, because white fails on the brighter half of the palette.
 
+### The two children
+
+The girl with balloons and the boy with blocks are vector traces of the
+reference paintings, made with vtracer and optimised with svgo. They live in
+`public/characters/` and load as plain images, so their path data never enters
+the JavaScript bundle. Gzipped they weigh less than the original WebP files.
+
+The girl is two layers on one 720 x 900 canvas: her body, and the balloons with
+their strings. The balloon layer pivots on the point where the strings enter
+her fist, so the bundle sways as if held. To retrace them, see the comments in
+`src/components/characters/Kid.tsx`.
+
+### The Atlas
+
+On a laptop the shortlist shows the list and the map side by side. Resting on a
+card lights its pin; tapping a pin lights its card. Filters remove pins from the
+map as well as cards from the list, so the two never disagree. On a phone the
+same page switches between List and Atlas.
+
 Layout is mobile first. Phones and tablets get a bottom bar under the thumb,
 laptops get a rail on the left. Every interactive target is at least 44px.
 

@@ -21,6 +21,8 @@ export function SchoolCard({
   onToggleSave,
   onShowOnMap,
   index = 0,
+  highlighted = false,
+  onPoint,
 }: {
   school: School;
   score: ScoreResult;
@@ -31,6 +33,10 @@ export function SchoolCard({
   onShowOnMap?: () => void;
   /** Position in the list, used only to stagger the arrival. */
   index?: number;
+  /** True when this school's pin is the one chosen on the map. */
+  highlighted?: boolean;
+  /** Called when the pointer rests on the card, so the map can answer. */
+  onPoint?: () => void;
 }) {
   const curriculum = school.facts.curriculum;
   const cctv = school.facts.cctvParentAccess?.value === true;
@@ -41,9 +47,13 @@ export function SchoolCard({
 
   return (
     <article
+      id={`school-${school.id}`}
+      onMouseEnter={onPoint}
+      data-highlighted={highlighted || undefined}
       className={cn(
         crayonClass(school.id),
-        "panel-crayon anim-rise hover-lift flex flex-col overflow-hidden hover:shadow-[var(--shadow-lift)]",
+        "panel-crayon anim-rise hover-lift flex scroll-mt-28 flex-col overflow-hidden transition-[box-shadow] hover:shadow-[var(--shadow-lift)]",
+        highlighted && "ring-3 ring-[var(--crayon)] ring-offset-2 ring-offset-paper",
         // Only the first few stagger. Past that it is just a wait.
         ["", "anim-d1", "anim-d2", "anim-d3", "anim-d4", "anim-d5"][
           Math.min(index, 5)

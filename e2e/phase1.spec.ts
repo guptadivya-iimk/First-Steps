@@ -7,14 +7,28 @@ test.describe("Core flows", () => {
     const headline = page.getByRole("heading", { level: 1 });
     await expect(headline).toContainText("A first school");
     await expect(headline).toContainText("you can trust");
-    await expect(page.getByText("Real cab times")).toBeVisible();
-    await expect(page.getByText("Montessori, checked")).toBeVisible();
+
+    // The four questions the product answers, and how it answers them.
+    await expect(page.getByText("Is it really Montessori?")).toBeVisible();
+    await expect(page.getByText("Can you watch the CCTV?")).toBeVisible();
+    await expect(page.getByText("How long is the cab ride?")).toBeVisible();
+    await expect(page.getByText("Who says so?")).toBeVisible();
+
     await expect(
-      page.getByRole("link", { name: /Continue with Google/i })
+      page.getByRole("link", { name: /Find a school/i }).first()
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: /Look around first/i })
     ).toBeVisible();
+  });
+
+  test("the illustrated children load as vector images", async ({ page, request }) => {
+    await page.goto("/");
+    for (const file of ["girl-body", "girl-balloons", "boy-blocks"]) {
+      const res = await request.get(`/characters/${file}.svg`);
+      expect(res.ok(), `${file}.svg`).toBeTruthy();
+      expect(res.headers()["content-type"]).toContain("svg");
+    }
   });
 
   test("consent is required before the shortlist", async ({ page }) => {
@@ -77,8 +91,15 @@ test.describe("Core flows", () => {
     );
     await expect(page.getByText(/Why \d+ out of 100/)).toBeVisible();
     await expect(page.getByText("Where each fact came from")).toBeVisible();
-    await expect(page.getByText("Says pure Montessori")).toBeVisible();
     await expect(page.getByText("Worth asking about")).toBeVisible();
+
+    // The four answers sit at a glance, each with the source it came from.
+    const glance = page.getByRole("region", { name: "At a glance" });
+    await expect(glance.getByText("Says pure Montessori")).toBeVisible();
+    await expect(glance.getByText("Method")).toBeVisible();
+    await expect(glance.getByText("Parent CCTV")).toBeVisible();
+    await expect(glance.getByText("Daycare", { exact: true })).toBeVisible();
+    await expect(glance.getByText("Fees", { exact: true })).toBeVisible();
   });
 
   test("saving a school carries it through to compare", async ({ page }) => {
@@ -103,13 +124,15 @@ test.describe("Core flows", () => {
     ).toBeVisible();
   });
 
-  test("the atlas pins every matching school on a real map", async ({ page }) => {
+  test("the atlas pins every matching school on a real map", async ({
+    page,
+    isMobile,
+  }) => {
     await page.goto("/shortlist");
-    await page.getByRole("button", { name: "Atlas" }).click();
+    // Phones switch between list and map. Laptops show both side by side.
+    if (isMobile) await page.getByRole("button", { name: "Atlas" }).click();
 
-    const map = page.getByRole("application", {
-      name: /Map of preschools/i,
-    });
+    const map = page.getByRole("application", { name: /Map of preschools/i });
     await expect(map).toBeVisible();
 
     // One pin per matching school, each carrying its own fit score.
@@ -118,9 +141,51 @@ test.describe("Core flows", () => {
     expect(await pins.count()).toBeGreaterThan(5);
 
     await pins.first().click();
+    if (isMobile) {
+      await expect(page.getByRole("link", { name: /See the details/i })).toBeVisible();
+    } else {
+      // On a laptop, choosing a pin lights up that school's card in the list.
+      await expect(page.locator("article[data-highlighted]")).toHaveCount(1);
+    }
+  });
+
+  test("a filter takes schools off the map as well as the list", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "The list and the map are side by side only on a laptop.");
+    await page.goto("/shortlist");
+    const pins = page.locator(".firststeps-pin-shape");
+    await expect(pins.first()).toBeVisible();
+    const before = await pins.count();
+
+    await page.getByRole("button", { name: "Parent CCTV" }).click();
+    const cards = page.locator('article[id^="school-"]');
+    await expect(pins).toHaveCount(await cards.count());
+    expect(await pins.count()).toBeLessThan(before);
+  });
+
+  test("the landing link opens straight onto the Atlas", async ({ page }) => {
+    await page.goto("/shortlist?view=map");
     await expect(
-      page.getByRole("link", { name: /See the details/i })
+      page.getByRole("application", { name: /Map of preschools/i })
     ).toBeVisible();
+  });
+
+  test("drafting questions opens WhatsApp with the questions written", async ({
+    page,
+  }) => {
+    await page.goto("/school/productive-minds-sec-47");
+    const draft = page.getByRole("link", { name: /Draft my questions/i });
+    await expect(draft).toBeVisible();
+
+    const href = (await draft.getAttribute("href")) ?? "";
+    const url = new URL(href);
+    expect(url.host).toBe("wa.me");
+    const text = url.searchParams.get("text") ?? "";
+    expect(text).toContain("What are the monthly fees?");
+    // Nothing goes out on its own: the link opens the parent's own app.
+    await expect(draft).toHaveAttribute("target", "_blank");
   });
 
   test("the five priorities always add up to a hundred", async ({ page }) => {

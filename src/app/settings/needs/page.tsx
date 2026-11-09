@@ -15,6 +15,7 @@ import {
   type UserWeights,
 } from "@/lib/scoring/weights";
 import { Sprout } from "@/components/doodles";
+import { PRIORITY_CRAYON } from "@/lib/priorities";
 import { cn } from "@/lib/utils";
 
 /**
@@ -35,31 +36,31 @@ const WEIGHT_ROWS: {
     key: "montessori",
     label: "Montessori",
     hint: "Trained teachers and a real prepared classroom",
-    crayon: "crayon crayon-lagoon",
+    crayon: PRIORITY_CRAYON.montessori,
   },
   {
     key: "safety",
     label: "Safety",
     hint: "CCTV you can watch, women-only toileting staff",
-    crayon: "crayon crayon-tangerine",
+    crayon: PRIORITY_CRAYON.safety,
   },
   {
     key: "daycare",
     label: "Daycare",
     hint: "Hours past the school day",
-    crayon: "crayon crayon-grape",
+    crayon: PRIORITY_CRAYON.daycare,
   },
   {
     key: "travel",
     label: "Travel",
     hint: "Minutes in the cab each morning",
-    crayon: "crayon crayon-berry",
+    crayon: PRIORITY_CRAYON.travel,
   },
   {
     key: "fees",
     label: "Fees",
     hint: "What it costs each month",
-    crayon: "crayon crayon-sunshine",
+    crayon: PRIORITY_CRAYON.fees,
   },
 ];
 

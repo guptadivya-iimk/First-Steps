@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import type { Map as LeafletMap, Marker } from "leaflet";
+import type { Map as LeafletMap, Marker, LayerGroup } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { cn } from "@/lib/utils";
 import { CRAYON_HEX, crayonFor } from "@/lib/schoolIdentity";
@@ -18,10 +18,14 @@ export interface MapSchool {
 /**
  * The Atlas.
  *
- * Leaflet is loaded in the browser only, on first paint of this component, so
- * it never reaches the server bundle. Tiles come straight from OpenStreetMap,
- * which needs no key, and a CSS filter mutes them so our own pins carry the
- * colour rather than competing with the roads.
+ * Leaflet is loaded in the browser only, so it never reaches the server
+ * bundle. Tiles come from OpenStreetMap, which needs no key, and a CSS filter
+ * mutes them so our pins carry the colour rather than competing with roads.
+ *
+ * The map is built once, but its pins follow the `schools` prop: when the
+ * parent filters the list, the pins that no longer match leave the map and
+ * the view refits to what is left. A list and a map that disagree about which
+ * schools are in play would be worse than no map.
  */
 export function SchoolMap({
   schools,
@@ -38,19 +42,23 @@ export function SchoolMap({
 }) {
   const holder = React.useRef<HTMLDivElement>(null);
   const map = React.useRef<LeafletMap | null>(null);
+  const layer = React.useRef<LayerGroup | null>(null);
   const markers = React.useRef<Record<string, Marker>>({});
+  const leaflet = React.useRef<typeof import("leaflet") | null>(null);
   const cleanup = React.useRef<(() => void) | null>(null);
   const onSelectRef = React.useRef(onSelect);
   const [ready, setReady] = React.useState(false);
 
   onSelectRef.current = onSelect;
 
+  // ---- Build the map once. ----
   React.useEffect(() => {
     let cancelled = false;
 
     (async () => {
       const L = (await import("leaflet")).default;
       if (cancelled || !holder.current || map.current) return;
+      leaflet.current = L;
 
       const instance = L.map(holder.current, {
         center: [home.lat, home.lng],
@@ -66,52 +74,22 @@ export function SchoolMap({
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(instance);
 
-      // Home sits under the school pins, as a soft ring rather than a marker.
+      // Home sits under the school pins as a soft ring rather than a marker.
       L.circleMarker([home.lat, home.lng], {
         radius: 9,
-        color: "#17343a",
-        weight: 2,
+        color: "#191816",
+        weight: 2.5,
         fillColor: "#ffffff",
         fillOpacity: 1,
       })
         .addTo(instance)
         .bindTooltip("You are here", { direction: "top", offset: [0, -8] });
 
-      for (const school of schools) {
-        const hex = CRAYON_HEX[crayonFor(school.id)];
-        const icon = L.divIcon({
-          className: "firststeps-pin",
-          html: `<span class="firststeps-pin-shape" style="--pin:${hex}">
-                   <span class="firststeps-pin-score">${Math.round(school.score)}</span>
-                 </span>`,
-          iconSize: [38, 46],
-          iconAnchor: [19, 44],
-          popupAnchor: [0, -40],
-        });
-
-        const marker = L.marker([school.lat, school.lng], {
-          icon,
-          title: school.name,
-          keyboard: true,
-          alt: `${school.name}, ${school.sector}`,
-        })
-          .addTo(instance)
-          .on("click", () => onSelectRef.current(school.id));
-
-        markers.current[school.id] = marker;
-      }
-
-      const all = L.latLngBounds([
-        [home.lat, home.lng],
-        ...schools.map((s) => [s.lat, s.lng] as [number, number]),
-      ]);
-      instance.fitBounds(all, { padding: [48, 48] });
+      layer.current = L.layerGroup().addTo(instance);
 
       const resize = new ResizeObserver(() => instance.invalidateSize());
       resize.observe(holder.current);
       cleanup.current = () => resize.disconnect();
-
-      // One more pass after the first paint settles the tile grid.
       window.setTimeout(() => instance.invalidateSize(), 120);
 
       map.current = instance;
@@ -123,13 +101,57 @@ export function SchoolMap({
       cleanup.current?.();
       map.current?.remove();
       map.current = null;
+      layer.current = null;
       markers.current = {};
     };
-    // Pins are built once from the full seed list; selection is handled below.
+    // The map itself is built once; pins are synced by the effect below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Keep the chosen pin on top and centred.
+  // ---- Keep the pins in step with the list. ----
+  const signature = schools
+    .map((s) => `${s.id}:${Math.round(s.score)}`)
+    .join("|");
+
+  React.useEffect(() => {
+    const L = leaflet.current;
+    if (!ready || !L || !map.current || !layer.current) return;
+
+    layer.current.clearLayers();
+    markers.current = {};
+
+    for (const school of schools) {
+      const hex = CRAYON_HEX[crayonFor(school.id)];
+      const icon = L.divIcon({
+        className: "firststeps-pin",
+        html: `<span class="firststeps-pin-shape" style="--pin:${hex}">
+                 <span class="firststeps-pin-score">${Math.round(school.score)}</span>
+               </span>`,
+        iconSize: [38, 46],
+        iconAnchor: [19, 44],
+      });
+
+      const marker = L.marker([school.lat, school.lng], {
+        icon,
+        title: school.name,
+        keyboard: true,
+        alt: `${school.name}, ${school.sector}`,
+      }).on("click", () => onSelectRef.current(school.id));
+
+      layer.current.addLayer(marker);
+      markers.current[school.id] = marker;
+    }
+
+    const bounds = L.latLngBounds([
+      [home.lat, home.lng],
+      ...schools.map((s) => [s.lat, s.lng] as [number, number]),
+    ]);
+    map.current.fitBounds(bounds, { padding: [56, 56], maxZoom: 15 });
+    // `signature` captures every change to the pin set that matters.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, signature]);
+
+  // ---- Raise and centre the chosen pin. ----
   React.useEffect(() => {
     if (!ready) return;
     for (const [id, marker] of Object.entries(markers.current)) {
@@ -141,7 +163,7 @@ export function SchoolMap({
         animate: true,
       });
     }
-  }, [selectedId, ready]);
+  }, [selectedId, ready, signature]);
 
   return (
     <div

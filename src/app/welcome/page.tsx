@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Check, X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sprout } from "@/components/doodles";
-import { BalloonGirl } from "@/components/doodles/BalloonGirl";
+import { Kid } from "@/components/characters/Kid";
 
 const KEPT = [
   "The part of Sector 47 you search from",
@@ -40,7 +40,7 @@ export default function WelcomeConsentPage() {
 
   return (
     <main className="paper-grid flex min-h-dvh flex-col items-center justify-center px-4 py-10 sm:px-6">
-      <BalloonGirl className="anim-pop mb-[-1.25rem] w-44 sm:w-52" />
+      <Kid who="girl" priority className="anim-pop -mb-6 w-44 sm:w-52" />
 
       <div className="panel w-full max-w-lg p-6 sm:p-8">
         <h1 className="font-display text-step-8 leading-tight font-extrabold text-ink">

@@ -266,6 +266,32 @@
     margin-left: 1.1rem;
   }
 
+  /* Section titles reuse the move in other colours. Every pairing below was
+     measured: ink on lagoon is 7.8:1, ink on sunshine 12:1, white on grape 8:1. */
+  .block-word--c {
+    background: var(--lagoon);
+    color: var(--ink);
+  }
+
+  .block-word--d {
+    background: var(--sunshine);
+    color: var(--ink);
+  }
+
+  .block-word--e {
+    background: var(--grape);
+    color: oklch(100% 0 0);
+  }
+
+  /* A printed sticker sits slightly askew. */
+  .tilt-l {
+    transform: rotate(-2deg);
+  }
+
+  .tilt-r {
+    transform: rotate(1.5deg);
+  }
+
   /* ------------------------------------------------------------------
      The crayon box.
 
@@ -372,6 +398,7 @@
   .text-step-9 { font-size: var(--text-step-9); }
   .text-step-10 { font-size: var(--text-step-10); }
   .text-step-11 { font-size: var(--text-step-11); }
+  .text-step-12 { font-size: var(--text-step-12); }
 }
 
 /* ---------------------------------------------------------------------------
@@ -474,190 +501,68 @@
    whole lot off.
    --------------------------------------------------------------------------- */
 
-/* ---- Characters, idling ---- */
+/* ---- The illustrated children, idling ---- */
 
-.character {
-  overflow: visible;
+/* No width here. This block sits outside the Tailwind layers, so anything
+   set on it would outrank the w-* utility a page passes in. Width comes from
+   the component's own w-full default, which a page can override. */
+.kid {
+  position: relative;
 }
 
-@keyframes bob {
+.kid > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+@keyframes kid-float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-7px); }
+  50% { transform: translateY(-8px); }
 }
 
-@keyframes roll {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes waving {
-  0%, 62%, 100% { transform: rotate(0deg); }
-  70% { transform: rotate(-20deg); }
-  78% { transform: rotate(6deg); }
-  86% { transform: rotate(-16deg); }
-}
-
-@keyframes nod {
-  0%, 100% { transform: rotate(-1.6deg); }
-  50% { transform: rotate(1.6deg); }
-}
-
-@keyframes drift {
-  0%, 100% { transform: translate(0, 0) rotate(-3deg); }
-  50% { transform: translate(5px, -11px) rotate(3deg); }
-}
-
-@keyframes flap {
-  0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(0.45); }
-}
-
-@keyframes zip {
-  0%, 100% { opacity: 0.15; transform: translateX(0); }
-  50% { opacity: 0.6; transform: translateX(-9px); }
-}
-
-.character__body {
-  animation: bob 3.4s ease-in-out infinite;
-}
-
-.character__scooter {
-  animation: bob 3.4s ease-in-out infinite;
-}
-
-/* The wheels have to spin about their own centres, so each is given one. */
-.character__wheel {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: roll 2.6s linear infinite;
-}
-
-.character__wheel--b {
-  animation-duration: 2.6s;
-}
-
-.character__wave {
-  transform-box: fill-box;
-  transform-origin: 92% 86%;
-  animation: waving 4.2s ease-in-out infinite;
-}
-
-.character__head {
-  transform-box: fill-box;
-  transform-origin: center bottom;
-  animation: nod 3.4s ease-in-out infinite;
-}
-
-.character__balloon {
-  transform-box: fill-box;
-  transform-origin: center bottom;
-  animation: drift 6s ease-in-out infinite;
-}
-
-.character__zips > path {
-  animation: zip 2.2s ease-in-out infinite;
-}
-
-.character__zips > path:last-child {
-  animation-delay: 0.4s;
-}
-
-.character__hover {
-  animation: bob 2.8s ease-in-out infinite;
-}
-
-.character__wing {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: flap 0.9s ease-in-out infinite;
-}
-
-.character__spin {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: roll 24s linear infinite;
-}
-
-/* ---- The two drawn children ---- */
-
-@keyframes place-block {
-  0%, 100% { transform: translateY(0); }
-  45% { transform: translateY(-9px); }
-}
-
-@keyframes settle {
-  0%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-6px) rotate(-2deg); }
-}
-
-@keyframes breathe {
+@keyframes kid-breathe {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.015); }
+  50% { transform: scale(1.012); }
 }
 
-@keyframes tilt {
-  0%, 100% { transform: rotate(-2deg); }
-  50% { transform: rotate(2deg); }
+/* The balloons pivot on her fist, where the strings are gathered. That point
+   sits at 27.5% across and 47.3% down the 720 x 900 canvas. */
+@keyframes balloon-sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
 }
 
-/* The boy leans in, lifts the block, and his head follows it. */
-.bb-body {
-  transform-box: fill-box;
-  transform-origin: center bottom;
-  animation: breathe 4s ease-in-out infinite;
+.kid-float {
+  animation: kid-float 6s ease-in-out infinite;
 }
 
-.bb-arm {
-  transform-box: fill-box;
-  transform-origin: 10% 80%;
-  animation: place-block 4s ease-in-out infinite;
+.kid-breathe {
+  transform-origin: 50% 100%;
+  animation: kid-breathe 4.6s ease-in-out infinite;
 }
 
-.bb-block-top {
-  transform-box: fill-box;
-  transform-origin: center bottom;
-  animation: settle 4s ease-in-out infinite;
+.kid-balloons {
+  transform-origin: 27.5% 47.3%;
+  animation: balloon-sway 5.4s ease-in-out infinite;
 }
 
-.bb-head {
-  transform-box: fill-box;
-  transform-origin: 52% 92%;
-  animation: tilt 5s ease-in-out infinite;
+/* Scribbles drift a little, out of step with each other. */
+@keyframes doodle-drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(3px, -5px) rotate(6deg); }
 }
 
-/* The girl laughs up at her balloons, which drift on their strings. */
-.bg-body {
-  transform-box: fill-box;
-  transform-origin: center bottom;
-  animation: breathe 3.6s ease-in-out infinite;
+.doodle-drift {
+  animation: doodle-drift 7s ease-in-out infinite;
 }
 
-.bg-head {
-  transform-box: fill-box;
-  transform-origin: 50% 95%;
-  animation: tilt 4.4s ease-in-out infinite;
-}
-
-.bg-arm {
-  transform-box: fill-box;
-  transform-origin: 90% 85%;
-  animation: tilt 4.4s ease-in-out infinite;
-}
-
-.bg-balloon {
-  transform-box: fill-box;
-  transform-origin: center bottom;
-  animation: drift 6s ease-in-out infinite;
-}
-
-.bg-balloon--b {
-  animation-duration: 7.2s;
-  animation-delay: -1.4s;
-}
-
-.bg-balloon--c {
-  animation-duration: 6.6s;
-  animation-delay: -2.8s;
+.doodle-drift--slow {
+  animation-duration: 9.5s;
+  animation-delay: -3s;
 }
 
 /* ---- Arrival, played once ---- */
